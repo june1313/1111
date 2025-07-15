@@ -1,13 +1,16 @@
+# main.py (수정 후)
+
 import base64
 import io
 import uvicorn
+import httpx  # 'requests' 대신 'httpx'를 import 합니다.
 from fastapi import FastAPI, File, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
 from PIL import Image
-import requests # AI 생성 로직 파일 (이전에 작성한 코드)
 
-# --- 아래는 이전에 작성했던 AI 이미지 생성 함수 ---
-def generate_remodeled_image(input_image_bytes, mode='Interior'):
+# --- AI 이미지 생성 함수를 비동기(async) 함수로 변경 ---
+# 함수 이름 앞에 'async'를 붙여줍니다.
+async def generate_remodeled_image(input_image_bytes, mode='Interior'):
     try:
         url = "http://127.0.0.1:7860"
         encoded_image = base64.b64encode(input_image_bytes).decode('utf-8')
@@ -24,7 +27,11 @@ def generate_remodeled_image(input_image_bytes, mode='Interior'):
             "steps": 30, "cfg_scale": 7, "denoising_strength": 0.75
         }
         
-        response = requests.post(url=f'{url}/sdapi/v1/img2img', json=payload)
+        # 'requests.post' 대신 'httpx.AsyncClient'를 사용합니다.
+        async with httpx.AsyncClient() as client:
+            # 타임아웃을 넉넉하게 5분(300초)으로 설정합니다. (이미지 생성이 오래 걸리므로)
+            response = await client.post(url=f'{url}/sdapi/v1/img2img', json=payload, timeout=300.0)
+        
         response.raise_for_status()
 
         r = response.json()
@@ -38,10 +45,9 @@ def generate_remodeled_image(input_image_bytes, mode='Interior'):
 
 app = FastAPI()
 
-# CORS 미들웨어 추가 (React 앱과 통신하기 위해 필수)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # React 개발 서버 주소
+    allow_origins=["http://localhost:5173"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -49,16 +55,12 @@ app.add_middleware(
 
 @app.post("/api/generate")
 async def generate_image_endpoint(mode: str = Form(...), file: UploadFile = File(...)):
-    """
-    React로부터 이미지와 모드를 받아 AI 이미지를 생성하고 반환하는 API
-    """
     input_image_bytes = await file.read()
     
-    # AI 이미지 생성 함수 호출
-    generated_image_bytes = generate_remodeled_image(input_image_bytes, mode)
+    # 'async' 함수를 호출할 때는 앞에 'await'를 붙여줍니다.
+    generated_image_bytes = await generate_remodeled_image(input_image_bytes, mode)
 
     if generated_image_bytes:
-        # 생성된 이미지를 다시 base64 문자열로 인코딩하여 JSON으로 반환
         img_base64 = base64.b64encode(generated_image_bytes).decode('utf-8')
         return {"image_base64": img_base64}
     else:

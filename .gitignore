@@ -1,8 +1,4 @@
-# Dependencies
 /node_modules
-
-# Build
+venv/
 /dist
-
-# System files
 .DS_Store
