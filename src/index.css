@@ -1,0 +1,14 @@
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: #f0f2f5;
+}
+
+body {
+  /* 이 부분이 핵심입니다: Flexbox를 이용해 자식 요소를 중앙 정렬합니다. */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
