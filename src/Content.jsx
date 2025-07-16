@@ -5,7 +5,7 @@ function Content({ activeTool }) {
   const [previewUrl, setPreviewUrl] = useState('');
   const [resultUrl, setResultUrl] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isDragging, setIsDragging] = useState(false); // 드래그 상태를 위한 state 추가
+  const [isDragging, setIsDragging] = useState(false);
 
   const toolData = {
     'Interior': {
@@ -22,7 +22,7 @@ function Content({ activeTool }) {
 
   const currentTool = toolData[activeTool];
 
-  // 파일 처리 로직을 별도 함수로 분리하여 재사용
+  // 파일 처리 로직
   const processFile = (file) => {
     if (file) {
       setImageFile(file);
@@ -35,20 +35,47 @@ function Content({ activeTool }) {
     processFile(event.target.files[0]);
   };
 
+  // API 연동을 위해 수정된 함수
   const handleGenerateClick = async () => {
     if (!imageFile) {
       alert('먼저 이미지를 업로드해주세요.');
       return;
     }
     setIsLoading(true);
-    console.log(`"${activeTool}" 모드에서 사용할 프롬프트:`, currentTool.prompt);
-    setTimeout(() => {
-      setResultUrl('https://images.unsplash.com/photo-1554995207-c18c203602cb?q=80&w=2070');
+    setResultUrl(''); // 이전 결과 이미지 초기화
+
+    // FormData 객체를 사용하여 파일과 텍스트를 함께 보냅니다.
+    const formData = new FormData();
+    formData.append('imageFile', imageFile); // 'imageFile'은 파이썬에서 받을 때 사용한 키
+    formData.append('prompt', currentTool.prompt); // 'prompt' 키로 현재 도구의 프롬프트를 전송
+
+    try {
+      const response = await fetch('http://localhost:5000/api/generate-image-from-file', {
+        method: 'POST',
+        body: formData, // FormData를 body에 담아 전송
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (data.imageUrl) {
+        setResultUrl(data.imageUrl); // 서버에서 받은 이미지 URL로 상태 업데이트
+      } else {
+        throw new Error(data.error || '이미지 URL을 받지 못했습니다.');
+      }
+
+    } catch (error) {
+      console.error("이미지 생성 오류:", error);
+      alert(`이미지 생성에 실패했습니다: ${error.message}`);
+    } finally {
       setIsLoading(false);
-    }, 2000);
+    }
   };
 
-  // --- 드래그 앤 드롭 핸들러 추가 ---
+  // 드래그 앤 드롭 핸들러
   const handleDragOver = (event) => {
     event.preventDefault();
     setIsDragging(true);
@@ -74,7 +101,6 @@ function Content({ activeTool }) {
       </div>
 
       {!previewUrl ? (
-        // --- className 및 이벤트 핸들러 추가 ---
         <div 
           className={`upload-card ${isDragging ? 'drag-over' : ''}`}
           onDragOver={handleDragOver}
