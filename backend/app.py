@@ -21,31 +21,38 @@ def generate_sd_image(prompt, init_image_base64, controlnet_settings):
         "width": 512,
         "height": 512,
         "sampler_name": "Euler a",
-        "denoising_strength": 0.75,
+        "denoising_strength": 0.9,
         "alwayson_scripts": {
             "controlnet": {
                 "args": [
                     {
+                        "enabled": True,
                         "input_image": init_image_base64,
-                        "module": controlnet_settings.get("module", "canny"),
+                        "module": controlnet_settings.get("module"),
                         "model": controlnet_settings.get("model"),
                         "weight": controlnet_settings.get("weight", 1.0),
+                        "pixel_perfect": True,
                         "resize_mode": "Crop and Resize",
                         "control_mode": "Balanced",
+                        "guidance_start": 0.0,
+                        "guidance_end": 1.0,
+                        # Canny 전용 파라미터 추가
+                        "processor_res": 512,
+                        "threshold_a": controlnet_settings.get("low_threshold"),
+                        "threshold_b": controlnet_settings.get("high_threshold"),
                     }
                 ]
             }
         }
     }
     
-    print(f"'{prompt}' 프롬프트와 ControlNet으로 img2img 요청...")
+    print(f"'{prompt}' 프롬프트와 Canny ControlNet으로 img2img 요청...")
     response = requests.post(url=url, json=payload)
     
     if response.status_code == 200:
         r = response.json()
         image_data = r['images'][0]
         
-        # 'static/images' 폴더에 이미지 저장
         output_dir = os.path.join(app.static_folder, 'images')
         os.makedirs(output_dir, exist_ok=True)
         
@@ -57,7 +64,6 @@ def generate_sd_image(prompt, init_image_base64, controlnet_settings):
             f.write(base64.b64decode(image_data))
             
         print(f"이미지 저장 완료: {filepath}")
-        # URL 경로는 /static/images/filename 형태
         return f"/static/images/{filename}"
     else:
         print(f"API 오류 발생: {response.status_code}")
@@ -72,10 +78,13 @@ def handle_generate_from_file():
     file = request.files['imageFile']
     prompt = request.form.get('prompt', 'a photorealistic, modern redesign')
     
+    # --- 스크린샷의 Canny 설정을 여기에 반영 ---
     controlnet_settings = {
         "module": "canny",
-        "model": "control_v11p_sd15_canny [d14c016b]", 
+        "model": "control_v11p_sd15_canny [d14c016b]",
         "weight": 1.0,
+        "low_threshold": 100,  # Low Threshold 값
+        "high_threshold": 200, # High Threshold 값
     }
 
     init_image_base64 = base64.b64encode(file.read()).decode('utf-8')
@@ -87,11 +96,6 @@ def handle_generate_from_file():
         return jsonify({"imageUrl": full_image_url})
     else:
         return jsonify({"error": "이미지 생성에 실패했습니다."}), 500
-
-# --- 아래 함수를 삭제했습니다 ---
-# @app.route('/static/images/<filename>')
-# def serve_image(filename):
-#     return send_from_directory('static/images', filename)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
