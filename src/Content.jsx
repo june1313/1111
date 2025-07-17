@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import ReactCompareImage from 'react-compare-image';
 import './App.css'; // Ensure App.css is imported
-import Modal from 'react-modal';
+
 
 const STYLES = ["Modern", "Minimalist", "Scandinavian", "Bohemian", "Industrial", "Coastal"];
 const ROOM_TYPES = ["living room", "bedroom", "kitchen", "bathroom", "dining room", "home office", "patio"];
 
-Modal.setAppElement('#root');
 
 function Content({ activeTool }) {
     const [style, setStyle] = useState('Modern');
