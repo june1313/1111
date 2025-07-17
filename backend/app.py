@@ -8,20 +8,19 @@ import json
 
 # ==============================================================================
 # ✨ 1. 설정 영역 (Configuration Area)
-# - 모든 설정과 프롬프트를 이곳에서 관리하여 코드의 유지보수를 쉽게 합니다.
 # ==============================================================================
 
 # 기본 부정 프롬프트 (네거티브 프롬프트)
 NEGATIVE_PROMPT = "worst quality, low quality, jpeg artifacts, blurry, distorted, ugly, tiling, poorly drawn, disfigured, out of frame, extra limbs, bad anatomy, watermark, text, signature, clutter, messy, low-resolution"
 
-# 스타일별 긍정 프롬프트 템플릿
+# 스타일 및 방 구조별 긍정 프롬프트 템플릿
 STYLE_PROMPTS = {
-    "Modern": "(Modern style:1.2) interior design, a bright and clean living room, sleek furniture, (neutral color palette with a bold accent color:1.1), large windows with natural light, polished concrete floors, statement art piece on the wall",
-    "Minimalist": "(Minimalist style:1.3) interior design, an uncluttered and serene bedroom, essential furniture only, monochromatic color scheme, soft ambient lighting, clean lines, simplicity, organized, ample negative space",
-    "Scandinavian": "(Scandinavian style:1.2) interior design, a cozy and functional kitchen, (light wood cabinets:1.1), white walls, natural materials, minimalist decor, hygge atmosphere, clean and bright",
-    "Bohemian": "(Bohemian style:1.2) interior design, an eclectic and vibrant living room, (rich patterns and textures:1.1), macrame wall hangings, lots of indoor plants, vintage furniture, warm and earthy tones, layered rugs",
-    "Industrial": "(Industrial style:1.2) interior design, a spacious loft apartment, (exposed brick wall:1.1), metal light fixtures, visible ductwork, leather sofa, concrete floor, a mix of wood and metal elements",
-    "Coastal": "(Coastal style:1.1) interior design, an airy and relaxing bathroom, light blue and sand color palette, natural materials like wicker and light wood, large open windows with sheer curtains, seashell decor, clean and fresh"
+    "Modern": "(Modern style:1.2) interior design, a bright and clean {room_type}, sleek furniture, (neutral color palette with a bold accent color:1.1), large windows with natural light, polished concrete floors, statement art piece on the wall",
+    "Minimalist": "(Minimalist style:1.3) interior design, an uncluttered and serene {room_type}, essential furniture only, monochromatic color scheme, soft ambient lighting, clean lines, simplicity, organized, ample negative space",
+    "Scandinavian": "(Scandinavian style:1.2) interior design, a cozy and functional {room_type}, (light wood elements:1.1), white walls, natural materials, minimalist decor, hygge atmosphere, clean and bright",
+    "Bohemian": "(Bohemian style:1.2) interior design, an eclectic and vibrant {room_type}, (rich patterns and textures:1.1), macrame wall hangings, lots of indoor plants, vintage furniture, warm and earthy tones, layered rugs",
+    "Industrial": "(Industrial style:1.2) interior design, a spacious {room_type}, (exposed brick wall:1.1), metal light fixtures, visible ductwork, leather sofa, concrete floor, a mix of wood and metal elements",
+    "Coastal": "(Coastal style:1.1) interior design, an airy and relaxing {room_type}, light blue and sand color palette, natural materials like wicker and light wood, large open windows with sheer curtains, clean and fresh"
 }
 
 # 기본 이미지 생성 파라미터
@@ -31,7 +30,7 @@ DEFAULT_GENERATION_PARAMS = {
     "width": 512,
     "height": 512,
     "sampler_name": "DPM++ 2M Karras",
-    "denoising_strength": 0.75
+    "denoising_strength": 0.85
 }
 
 # 기본 컨트롤넷 파라미터
@@ -63,8 +62,8 @@ def generate_sd_image(payload):
     
     try:
         print("Stable Diffusion 서버에 이미지 생성을 요청합니다...")
-        response = requests.post(url=url, json=payload, timeout=300) # 타임아웃 5분 설정
-        response.raise_for_status()  # 200번대 상태 코드가 아니면 에러 발생
+        response = requests.post(url=url, json=payload, timeout=300)
+        response.raise_for_status()
     except requests.exceptions.Timeout:
         print("API 오류: Stable Diffusion 서버가 응답하지 않습니다 (Timeout).")
         return None, "Image generation server timed out."
@@ -101,12 +100,13 @@ def handle_generate_image():
     
     user_prompt = form_data.get('prompt', '')
     style = form_data.get('style', 'Modern')
-    # 프론트에서 넘어온 커스텀 설정 (JSON 문자열 형태)
+    room_type = form_data.get('room_type', 'living room')
     overrides = json.loads(form_data.get('overrides', '{}'))
 
     # --- 2. 프롬프트 및 설정 조합 ---
     base_style_prompt = STYLE_PROMPTS.get(style, STYLE_PROMPTS['Modern'])
-    positive_prompt = f"{user_prompt}, {base_style_prompt}, photorealistic, interior design magazine, 8k, high detail"
+    formatted_style_prompt = base_style_prompt.format(room_type=room_type)
+    positive_prompt = f"{user_prompt}, {formatted_style_prompt}, photorealistic, interior design magazine, 8k, high detail"
     
     generation_params = {**DEFAULT_GENERATION_PARAMS, **overrides.get('generation', {})}
     controlnet_params = {**DEFAULT_CONTROLNET_SETTINGS, **overrides.get('controlnet', {})}
