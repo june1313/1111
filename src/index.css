@@ -7,7 +7,6 @@ html, body, #root {
 }
 
 body {
-  /* 이 부분이 핵심입니다: Flexbox를 이용해 자식 요소를 중앙 정렬합니다. */
   display: flex;
   justify-content: center;
   align-items: center;

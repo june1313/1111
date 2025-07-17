@@ -1,4 +1,5 @@
 /node_modules
+static/
 venv/
 /dist
 .DS_Store

@@ -11,7 +11,7 @@ import json
 # ==============================================================================
 
 # 기본 부정 프롬프트 (네거티브 프롬프트)
-NEGATIVE_PROMPT = "worst quality, low quality, jpeg artifacts, blurry, distorted, ugly, tiling, poorly drawn, disfigured, out of frame, extra limbs, bad anatomy, watermark, text, signature, clutter, messy, low-resolution"
+NEGATIVE_PROMPT = "worst quality, low quality, jpeg artifacts, blurry, distorted, ugly, tiling, poorly drawn, disfigured, out of frame, extra limbs,amateur photography,gloomy, bad anatomy, watermark, text, signature, clutter, messy, low-resolution"
 
 # 스타일 및 방 구조별 긍정 프롬프트 템플릿
 STYLE_PROMPTS = {
@@ -25,24 +25,24 @@ STYLE_PROMPTS = {
 
 # 기본 이미지 생성 파라미터
 DEFAULT_GENERATION_PARAMS = {
-    "steps": 30,
+    "steps": 20,
     "cfg_scale": 7,
     "width": 512,
     "height": 512,
     "sampler_name": "DPM++ 2M Karras",
-    "denoising_strength": 0.85
+    "denoising_strength": 0.8
 }
 
 # 기본 컨트롤넷 파라미터
 DEFAULT_CONTROLNET_SETTINGS = {
     "module": "canny",
     "model": "control_v11p_sd15_canny [d14c016b]",
-    "weight": 1.0,
+    "weight": 1.2,
     "low_threshold": 100,
     "high_threshold": 200,
     "pixel_perfect": True,
     "resize_mode": "Crop and Resize",
-    "control_mode": "Balanced",
+    "control_mode": "My prompt is more important",
     "guidance_start": 0.0,
     "guidance_end": 1.0,
     "processor_res": 512
