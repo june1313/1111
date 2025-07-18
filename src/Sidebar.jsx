@@ -2,15 +2,15 @@ import React from 'react';
 
 function Sidebar({ activeTool, setActiveTool }) {
   const menuItems = [
-    { id: 'Interior', name: 'Interior AI', icon: 'cottage' }, // 🏠
-    { id: 'Exterior', name: 'Exterior AI', icon: 'villa' }, // 🏛️
+    { id: 'Interior', name: '인테리어', icon: 'cottage' }, // 🏠
+    { id: 'Exterior', name: '익스테리어', icon: 'villa' }, // 🏛️
   ];
 
   return (
     <nav className="sidebar">
       <div className="sidebar-header">
         <span className="material-symbols-outlined">auto_awesome_mosaic</span>
-        <h2>All Tools</h2>
+        <h2>도구</h2>
       </div>
       <ul className="menu-list">
         {menuItems.map((item) => (

@@ -3,13 +3,13 @@ import ReactCompareImage from 'react-compare-image';
 import './App.css'; // Ensure App.css is imported
 
 
-const STYLES = ["Modern", "Minimalist", "Scandinavian", "Bohemian", "Industrial", "Coastal"];
-const ROOM_TYPES = ["living room", "bedroom", "kitchen", "bathroom", "dining room", "home office", "patio"];
+const STYLES = ["모던", "미니멀리스트", "스칸디나비아", "보헤미안", "인더스트리얼", "코스탈"];
+const ROOM_TYPES = ["거실", "침실", "주방", "화장실", "다이닝 룸", "홈 오피스", "파티오"];
 
 
 function Content({ activeTool }) {
-    const [style, setStyle] = useState('Modern');
-    const [roomType, setRoomType] = useState('living room');
+    const [style, setStyle] = useState('모던');
+    const [roomType, setRoomType] = useState('거실');
     const [userPrompt, setUserPrompt] = useState('');
 
     const [imageFile, setImageFile] = useState(null);
@@ -36,7 +36,7 @@ function Content({ activeTool }) {
 
     const handleGenerateClick = async () => {
         if (!imageFile) {
-            alert('Please upload an image first.');
+            alert('이미지를 업로드 해주세요.');
             return;
         }
         setIsLoading(true);
@@ -108,34 +108,34 @@ function Content({ activeTool }) {
     return (
         <main className="content">
             <div className="content-header">
-                <h1>{activeTool === 'Interior' ? 'Interior AI Designer' : 'Exterior AI Designer'}</h1>
-                <p>Upload a photo and see your space transformed in seconds. The power of AI at your fingertips.</p>
+                <h1>{activeTool === 'Interior' ? "인테리어 AI 디자이너" : "익스테리어 AI 디자이너"}</h1>
+                <p>사진 한 장으로 몇 초 만에 공간을 바꿔보세요. AI의 힘이 당신 손끝에 있습니다.</p>
             </div>
 
             <div className="main-layout">
                 <div className="controls-panel">
                     <h3>
                         <span className="material-symbols-outlined">tune</span>
-                        Your Design Controls
+                        디자인 설정
                     </h3>
                     <div className="form-group">
-                        <label>1. Select Style</label>
+                        <label>1. 스타일 선택</label>
                         <select value={style} onChange={(e) => setStyle(e.target.value)}>
                             {STYLES.map(s => <option key={s} value={s}>{s}</option>)}
                         </select>
                     </div>
                     <div className="form-group">
-                        <label>2. Select Space Type</label>
+                        <label>2. 공간 유형 선택</label>
                         <select value={roomType} onChange={(e) => setRoomType(e.target.value)}>
                             {ROOM_TYPES.map(r => <option key={r} value={r}>{r.charAt(0).toUpperCase() + r.slice(1)}</option>)}
                         </select>
                     </div>
                     <div className="form-group">
-                        <label>3. Add Extra Details (Optional)</label>
+                        <label>3. 추가 정보 입력 (선택 사항)</label>
                         <textarea
                             value={userPrompt}
                             onChange={(e) => setUserPrompt(e.target.value)}
-                            placeholder="e.g., with a large leather sofa..."
+                            placeholder="예: 커다란 가죽 소파, 원목 커피 테이블..."
                         />
                     </div>
 
@@ -146,7 +146,7 @@ function Content({ activeTool }) {
                             disabled={isLoading || !imageFile}
                         >
                             <span className="material-symbols-outlined">auto_awesome</span>
-                            {isLoading ? 'Generating...' : 'Generate'}
+                            {isLoading ? "생성 중..." : "생성하기"}
                         </button>
                         {previewUrl && (
                             <button
@@ -154,7 +154,7 @@ function Content({ activeTool }) {
                                 onClick={handleStartNew}
                             >
                                 <span className="material-symbols-outlined">add_circle</span>
-                                Start New Project
+                                새로 만들기
                             </button>
                         )}
                     </div>
@@ -168,21 +168,21 @@ function Content({ activeTool }) {
                             onClick={() => document.getElementById('imageUpload').click()}
                         >
                             <span className="material-symbols-outlined upload-icon">add_photo_alternate</span>
-                            <h4>Upload Your Photo</h4>
-                            <p>Drag & Drop or Click to Browse</p>
+                            <h4>사진 업로드</h4>
+                            <p>드래그 앤 드롭 또는 클릭하여 업로드</p>
                             <input type="file" id="imageUpload" accept="image/*" onChange={handleImageUpload} hidden />
                         </div>
                     ) : (
                         <div className="result-container">
                             {showCompareSlider && resultUrl && !isLoading && !error ? (
                                 <div className="comparison-slider-wrapper">
-                                    <h4>Drag Handle to Compare</h4>
+                                    <h4>바를 움직여보세요</h4>
                                     <div className="comparison-slider-container">
                                         <ReactCompareImage
                                             leftImage={previewUrl}
                                             rightImage={resultUrl}
-                                            leftImageLabel="Original"
-                                            rightImageLabel="AI Result"
+                                            leftImageLabel="전"
+                                            rightImageLabel="후"
                                         />
                                     </div>
                                 </div>
@@ -190,7 +190,7 @@ function Content({ activeTool }) {
                                 <div className="result-view">
                                     <div className="image-box">
                                       <div className="image-box-header">
-                                        <h3>Original</h3>
+                                        <h3>원본</h3>
                                       </div>
                                         <div className="image-content-wrapper">
                                             <img src={previewUrl} alt="Original" />
@@ -198,10 +198,10 @@ function Content({ activeTool }) {
                                     </div>
                                     <div className="image-box">
                                         <div className="image-box-header">
-                                            <h3>AI Result</h3>
+                                            <h3>AI 이미지</h3>
                                             {resultUrl && !isLoading && !error && (
                                                 <button className="compare-button" onClick={toggleCompareSlider}>
-                                                    <span className="material-symbols-outlined">compare</span>
+                                                    <span className="material-symbols-outlined">비교하기</span>
                                                 </button>
                                             )}
                                         </div>
@@ -209,7 +209,7 @@ function Content({ activeTool }) {
                                             {isLoading && <div className="loading-spinner"></div>}
                                             {error && <div className="error-message">{error}</div>}
                                             {resultUrl && !isLoading && <img src={resultUrl} alt="AI Result" />}
-                                            {!isLoading && !resultUrl && !error && <div className="placeholder">Press 'Generate' to see the result.</div>}
+                                            {!isLoading && !resultUrl && !error && <div className="placeholder">생성하기 버튼을 클릭하세요.</div>}
                                         </div>
                                     </div>
                                 </div>
