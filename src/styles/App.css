@@ -1,0 +1,720 @@
+/* App.css - Google Material Design Style with Enhanced Comparison */
+:root {
+    --google-blue: #1a73e8;
+    --google-green: #34a853;
+    --text-primary: #202124;
+    --text-secondary: #5f6368;
+    --surface-color: #ffffff;
+    --background-color: #f0f2f5;
+    --border-color: #dadce0;
+}
+
+body {
+    margin: 0;
+    font-family: 'Roboto', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.app-layout {
+    display: flex;
+    height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 250px;
+    flex-shrink: 0;
+    background-color: var(--surface-color);
+    border-right: 1px solid var(--border-color);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    margin-bottom: 16px;
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+.sidebar-header .material-symbols-outlined {
+    margin-right: 16px;
+    color: var(--google-blue);
+}
+
+.menu-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.menu-item:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+}
+
+.menu-item.active {
+    background-color: #e8f0fe;
+    color: var(--google-blue);
+}
+
+.menu-item .material-symbols-outlined {
+    margin-right: 16px;
+}
+
+/* Content */
+.content {
+    flex-grow: 1;
+    padding: 32px 48px;
+    overflow-y: auto;
+}
+
+.content-header h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.content-header p {
+    color: var(--text-secondary);
+    font-size: 1rem;
+}
+
+.main-layout {
+  display: flex; 
+  gap: 2rem;     
+  align-items: flex-start; 
+}
+
+.controls-panel {
+  flex: 1; 
+  min-width: 400px; 
+}
+
+.controls-panel h3 {
+    display: flex;
+    align-items: center;
+    font-size: 1.2rem;
+    margin-top: 0;
+    margin-bottom: 24px;
+}
+
+.controls-panel h3 .material-symbols-outlined {
+    margin-right: 8px;
+    color: var(--google-green);
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+}
+
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    font-size: 1rem;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+}
+
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--google-blue);
+    box-shadow: 0 0 0 1px var(--google-blue);
+}
+
+.form-group textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.action-buttons-vertical {
+    margin-top: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.generate-button {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background-color: var(--google-blue);
+    color: white;
+    border: none;
+    border-radius: 24px;
+    padding: 12px 24px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: box-shadow 0.2s, background-color 0.2s;
+}
+
+.generate-button:hover {
+    background-color: #185abc;
+    box-shadow: 0 1px 3px 1px rgba(0, 0, 0, 0.15);
+}
+
+.generate-button:disabled {
+  background-color: #b0b0b0; /* 기존보다 조금 더 진한 회색 */
+  color: #ffffff;
+}
+
+.start-new-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: var(--text-secondary);
+    color: white;
+    border: none;
+    border-radius: 24px;
+    padding: 10px 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.start-new-button:hover {
+    background-color: var(--text-primary);
+}
+
+/* Image Panel */
+.image-panel {
+    flex: 1; /* 공간을 1만큼 차지 (더 좁게) */
+    /* ... */
+}
+
+.upload-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 2px dashed var(--border-color);
+    border-radius: 12px;
+    padding: 40px;
+    cursor: pointer;
+    text-align: center;
+    height: 400px;
+    transition: border-color 0.2s, background-color 0.2s;
+}
+
+.upload-card.drag-over {
+    border-color: var(--google-blue);
+    background-color: #e8f0fe;
+}
+
+.upload-icon {
+    font-size: 3rem !important;
+    color: var(--text-secondary);
+}
+
+.result-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.result-view {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.image-box {
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    background-color: var(--surface-color);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.image-box-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.image-box h3 {
+    margin: 0;
+}
+
+.compare-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    outline: none;
+    padding: 8px;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+}
+
+.compare-button:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.compare-button .material-symbols-outlined {
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+}
+
+.image-content-wrapper {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    min-height: 0;
+}
+
+.image-box img,
+.image-box .placeholder {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.loading-spinner {
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border-left-color: var(--google-blue);
+    margin: 100px auto;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.error-message {
+    padding: 16px;
+    background-color: #fce8e6;
+    color: #c5221f;
+    border-radius: 8px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+.comparison-slider-wrapper {
+    margin-top: 32px;
+}
+
+.comparison-slider-wrapper h4 {
+    text-align: center;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+}
+
+.comparison-slider-container {
+    width: 49%;           /* 너비를 80%로 줄입니다. 이 값을 조절해 보세요! */
+    margin: 24px auto;    /* 위쪽에 24px 여백을 주고, 좌우는 자동으로 계산해 가운데 정렬합니다. */
+    
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.comparison-slider-container > div {
+    border-radius: 12px;
+}
+
+
+.editor-container {
+    border: 1px solid #dadce0;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: #fff;
+    margin-top: 4px;
+}
+
+.editor-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 8px;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dadce0;
+}
+
+.editor-toolbar button {
+    background: none;
+    border: none;
+    padding: 6px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.editor-toolbar button:hover {
+    background-color: #e8eaed;
+}
+
+.editor-toolbar button.is-active {
+    background-color: #e8f0fe;
+    color: #1a73e8;
+}
+
+.toolbar-separator {
+    width: 1px;
+    height: 20px;
+    background-color: #dadce0;
+    margin: 0 4px;
+}
+
+.color-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 4px;
+}
+
+.color-input-wrapper input[type="color"] {
+    width: 22px;
+    height: 22px;
+    border: none;
+    padding: 0;
+    background: none;
+    cursor: pointer;
+}
+
+.editor-content {
+    padding: 12px;
+    min-height: 120px;
+}
+
+.editor-content .ProseMirror {
+    outline: none;
+}
+
+.editor-content .ProseMirror p {
+    margin: 0;
+}
+
+/* 기존 스타일과 충돌을 피하기 위해 몇 가지 조정 */
+.form-group select {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #dadce0;
+    font-size: 1rem;
+    background-color: #fff;
+}
+
+.generate-button {
+    width: 100%;
+    margin-top: 16px;
+    padding: 14px;
+    border-radius: 28px;
+    border: none;
+    background-color: #f0f2f5;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.generate-button:hover {
+    background-color: #e8eaed;
+}
+
+/* controls-panel 내부의 form-group에 flex-basis 속성 추가 */
+.controls-panel .form-group {
+    margin-bottom: 20px;
+    display: block; /* select 요소 등이 width: 100%를 갖도록 */
+}
+
+/* AdvancedInput 컴포넌트가 flex item이 되도록 설정 (controls-panel이 flex container임) */
+.controls-panel > .form-group:nth-child(4) { /* "추가 정보..." form-group 선택 */
+    flex-grow: 1; /* 남은 공간을 모두 차지하도록 */
+    display: flex; /* 내부 요소 배치 조정 가능 */
+    flex-direction: column; /* label과 AdvancedInput을 세로로 배치 */
+}
+
+/* editor-with-upload에 flex-grow 적용 */
+.editor-with-upload {
+    display: flex;
+    gap: 10px;
+    flex-grow: 1; /* 남은 공간을 채우도록 */
+}
+
+.editor-wrapper {
+    flex: 1; /* 에디터 영역이 남은 공간을 차지 */
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: var(--surface-color);
+    display: flex; /* 내부 요소 배치 조정 가능 */
+    flex-direction: column;
+}
+
+.upload-area {
+    width: 200px; /* 업로드 영역의 고정 너비 (조정 가능) */
+    border: 2px dashed var(--border-color);
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.3s ease, background-color 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.upload-area > * {
+    margin-bottom: 5px;
+}
+
+.upload-area > *:last-child {
+    margin-bottom: 0;
+}
+
+.resizable-image-container {
+  display: inline-block; /* 이미지가 다른 요소와 잘 어우러지도록 */
+  position: relative;
+  line-height: 0; /* 이미지 아래 불필요한 공백 제거 */
+}
+
+.resizable-image-container.selected {
+  outline: 2px solid var(--google-blue); /* 선택되었을 때 파란색 테두리 */
+}
+
+.resizable-image-container img {
+  max-width: 100%; /* 에디터 너비를 넘어가지 않도록 */
+  height: auto;
+}
+
+.resize-handle {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  width: 12px;
+  height: 12px;
+  background: var(--google-blue);
+  border: 2px solid white;
+  border-radius: 50%;
+  cursor: nwse-resize; /* 리사이즈 커서 모양 */
+  box-shadow: 0 0 5px rgba(0,0,0,0.2);
+}
+
+.prose-mirror-editor {
+    min-height: 150px; /* 이 값을 조절하여 원하는 높이로 변경하세요 */
+    padding: 12px;
+    outline: none;
+    line-height: 1.6;
+}
+
+.advanced-editor {
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+}
+
+.editor-toolbar {
+    padding: 8px;
+    background-color: #f8f9fa;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    align-items: center;
+}
+
+.editor-toolbar.color-toolbar {
+    border-top: 1px solid var(--border-color);
+    padding: 8px;
+}
+
+.editor-toolbar button {
+    background: none;
+    border: none;
+    padding: 6px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.editor-toolbar button:hover:not([disabled]) {
+    background-color: #e8eaed;
+}
+
+.editor-toolbar button.is-active {
+    background-color: #e8f0fe;
+    color: var(--google-blue);
+}
+
+.editor-toolbar button[disabled] {
+    cursor: not-allowed;
+    color: #bdc1c6;
+}
+
+.toolbar-separator {
+    width: 1px;
+    height: 20px;
+    background-color: var(--border-color);
+    margin: 0 4px;
+}
+
+/* 색상 팔레트 버튼 스타일 */
+.color-toolbar button {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 1px solid var(--border-color);
+    padding: 0;
+}
+
+.color-toolbar button.is-active {
+    border-color: var(--google-blue);
+    border-width: 2px;
+}
+
+/* 표 스타일링 */
+.prose-mirror-editor table {
+  border-collapse: collapse;
+  margin: 1rem 0;
+  width: 100%;
+}
+
+.prose-mirror-editor th,
+.prose-mirror-editor td {
+  border: 1px solid #ced4da;
+  padding: 8px;
+  min-width: 1em;
+  vertical-align: top;
+}
+
+.prose-mirror-editor th {
+  font-weight: bold;
+  text-align: left;
+  background-color: #f1f3f5;
+}
+
+/* 표 리사이즈 핸들 스타일 */
+.tableWrapper {
+  overflow-x: auto;
+}
+.resize-cursor {
+  cursor: col-resize;
+}
+
+.editor-toolbar .toolbar-select {
+    border: 1px solid transparent;
+    border-radius: 4px;
+    padding: 4px 6px;
+    background-color: transparent;
+    font-size: 14px;
+    margin: 0 2px;
+    cursor: pointer;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+.editor-toolbar .toolbar-select:hover {
+    background-color: #e8eaed;
+    border-color: #dadce0;
+}
+
+.prose-mirror-editor p {
+    margin: 0;
+}
+
+.bubble-menu {
+  display: flex;
+  background-color: var(--text-primary);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.bubble-menu button {
+  background: none;
+  border: none;
+  color: white;
+  padding: 6px;
+  border-radius: 4px;
+}
+
+.bubble-menu button.is-active {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.toolbar-number-input {
+  width: 50px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  padding: 4px 6px;
+  background-color: transparent;
+  font-size: 14px;
+}
+.toolbar-number-input:hover {
+    background-color: #e8eaed;
+    border-color: #dadce0;
+}
+
+.highlight-swatch {
+  width: 16px;
+  height: 16px;
+  border-radius: 2px;
+}
+
+.color-toolbar button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.prose-mirror-editor iframe {
+  width: 100%;
+  height: 315px;
+  border: none;
+}
+

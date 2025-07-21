@@ -1,17 +1,16 @@
+// src/Content.jsx
+
 import React, { useState } from 'react';
 import ReactCompareImage from 'react-compare-image';
-import './App.css'; // Ensure App.css is imported
-
-
+import AdvancedInput from '../components/Editor/AdvancedInput'; 
+import '../styles/App.css';                                 
 const STYLES = ["모던", "미니멀리스트", "스칸디나비아", "보헤미안", "인더스트리얼", "코스탈"];
 const ROOM_TYPES = ["거실", "침실", "주방", "화장실", "다이닝 룸", "홈 오피스", "파티오"];
-
 
 function Content({ activeTool }) {
     const [style, setStyle] = useState('모던');
     const [roomType, setRoomType] = useState('거실');
     const [userPrompt, setUserPrompt] = useState('');
-
     const [imageFile, setImageFile] = useState(null);
     const [previewUrl, setPreviewUrl] = useState('');
     const [resultUrl, setResultUrl] = useState('');
@@ -20,18 +19,36 @@ function Content({ activeTool }) {
     const [error, setError] = useState(null);
     const [showCompareSlider, setShowCompareSlider] = useState(false);
 
-    const handleImageChange = (file) => {
+    // '원본' 이미지 파일이 변경되었을 때의 핸들러
+    const handleMainImageChange = (file) => {
         if (file) {
             setImageFile(file);
             setPreviewUrl(URL.createObjectURL(file));
             setResultUrl('');
             setError(null);
-            setShowCompareSlider(false); // New image, hide slider
+            setShowCompareSlider(false);
         }
     };
-
+    
     const handleImageUpload = (event) => {
-        handleImageChange(event.target.files?.[0]);
+        handleMainImageChange(event.target.files?.[0]);
+    };
+    
+    // 오른쪽 패널의 드래그 앤 드롭 핸들러
+    const handleDragOver = (event) => {
+        event.preventDefault();
+        setIsDragging(true);
+    };
+
+    const handleDragLeave = (event) => {
+        event.preventDefault();
+        setIsDragging(false);
+    };
+
+    const handleDrop = (event) => {
+        event.preventDefault();
+        setIsDragging(false);
+        handleMainImageChange(event.dataTransfer?.files?.[0]);
     };
 
     const handleGenerateClick = async () => {
@@ -42,7 +59,7 @@ function Content({ activeTool }) {
         setIsLoading(true);
         setResultUrl('');
         setError(null);
-        setShowCompareSlider(false); // Generating new, hide slider
+        setShowCompareSlider(false);
 
         const formData = new FormData();
         formData.append('imageFile', imageFile);
@@ -62,15 +79,12 @@ function Content({ activeTool }) {
             }
 
             const data = await response.json();
-
             if (data.imageUrl) {
                 setResultUrl(data.imageUrl);
             } else {
                 throw new Error(data.error || 'Image URL not found in response.');
             }
-
         } catch (err) {
-            console.error("Image generation error:", err);
             setError(err.message);
         } finally {
             setIsLoading(false);
@@ -83,22 +97,7 @@ function Content({ activeTool }) {
         setResultUrl('');
         setError(null);
         setShowCompareSlider(false);
-    };
-
-    const handleDragOver = (event) => {
-        event.preventDefault();
-        setIsDragging(true);
-    };
-
-    const handleDragLeave = (event) => {
-        event.preventDefault();
-        setIsDragging(false);
-    };
-
-    const handleDrop = (event) => {
-        event.preventDefault();
-        setIsDragging(false);
-        handleImageChange(event.dataTransfer?.files?.[0]);
+        setUserPrompt('');
     };
 
     const toggleCompareSlider = () => {
@@ -113,6 +112,7 @@ function Content({ activeTool }) {
             </div>
 
             <div className="main-layout">
+                {/* 왼쪽 컨트롤 패널 */}
                 <div className="controls-panel">
                     <h3>
                         <span className="material-symbols-outlined">tune</span>
@@ -132,27 +132,18 @@ function Content({ activeTool }) {
                     </div>
                     <div className="form-group">
                         <label>3. 추가 정보 입력 (선택 사항)</label>
-                        <textarea
-                            value={userPrompt}
-                            onChange={(e) => setUserPrompt(e.target.value)}
-                            placeholder="예: 커다란 가죽 소파, 원목 커피 테이블..."
+                        <AdvancedInput
+                            userPrompt={userPrompt}
+                            setUserPrompt={setUserPrompt}
                         />
                     </div>
-
                     <div className="action-buttons-vertical">
-                        <button
-                            className="generate-button"
-                            onClick={handleGenerateClick}
-                            disabled={isLoading || !imageFile}
-                        >
+                        <button className="generate-button" onClick={handleGenerateClick} disabled={isLoading || !imageFile}>
                             <span className="material-symbols-outlined">auto_awesome</span>
                             {isLoading ? "생성 중..." : "생성하기"}
                         </button>
                         {previewUrl && (
-                            <button
-                                className="start-new-button"
-                                onClick={handleStartNew}
-                            >
+                            <button className="start-new-button" onClick={handleStartNew}>
                                 <span className="material-symbols-outlined">add_circle</span>
                                 새로 만들기
                             </button>
@@ -160,48 +151,43 @@ function Content({ activeTool }) {
                     </div>
                 </div>
 
+                {/* 오른쪽 이미지 패널 (원본 이미지 업로드 기능) */}
                 <div className="image-panel">
                     {!previewUrl ? (
                         <div
                             className={`upload-card ${isDragging ? 'drag-over' : ''}`}
-                            onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop}
-                            onClick={() => document.getElementById('imageUpload').click()}
+                            onDragOver={handleDragOver}
+                            onDragLeave={handleDragLeave}
+                            onDrop={handleDrop}
+                            onClick={() => document.getElementById('imageUploadInput').click()}
                         >
                             <span className="material-symbols-outlined upload-icon">add_photo_alternate</span>
                             <h4>사진 업로드</h4>
                             <p>드래그 앤 드롭 또는 클릭하여 업로드</p>
-                            <input type="file" id="imageUpload" accept="image/*" onChange={handleImageUpload} hidden />
+                            <input type="file" id="imageUploadInput" accept="image/*" onChange={handleImageUpload} hidden />
                         </div>
                     ) : (
                         <div className="result-container">
-                            {showCompareSlider && resultUrl && !isLoading && !error ? (
+                            {showCompareSlider && resultUrl ? (
                                 <div className="comparison-slider-wrapper">
                                     <h4>바를 움직여보세요</h4>
                                     <div className="comparison-slider-container">
-                                        <ReactCompareImage
-                                            leftImage={previewUrl}
-                                            rightImage={resultUrl}
-                                            leftImageLabel="전"
-                                            rightImageLabel="후"
-                                        />
+                                        <ReactCompareImage leftImage={previewUrl} rightImage={resultUrl} leftImageLabel="전" rightImageLabel="후"/>
                                     </div>
                                 </div>
                             ) : (
                                 <div className="result-view">
                                     <div className="image-box">
-                                      <div className="image-box-header">
-                                        <h3>원본</h3>
-                                      </div>
-                                        <div className="image-content-wrapper">
-                                            <img src={previewUrl} alt="Original" />
-                                        </div>
+                                        <div className="image-box-header"><h3>원본</h3></div>
+                                        <div className="image-content-wrapper"><img src={previewUrl} alt="Original" /></div>
                                     </div>
                                     <div className="image-box">
                                         <div className="image-box-header">
                                             <h3>AI 이미지</h3>
-                                            {resultUrl && !isLoading && !error && (
+                                            {resultUrl && !isLoading && (
                                                 <button className="compare-button" onClick={toggleCompareSlider}>
-                                                    <span className="material-symbols-outlined">비교하기</span>
+                                                    <span className="material-symbols-outlined">compare_arrows</span>
+                                                    비교하기
                                                 </button>
                                             )}
                                         </div>
@@ -209,7 +195,7 @@ function Content({ activeTool }) {
                                             {isLoading && <div className="loading-spinner"></div>}
                                             {error && <div className="error-message">{error}</div>}
                                             {resultUrl && !isLoading && <img src={resultUrl} alt="AI Result" />}
-                                            {!isLoading && !resultUrl && !error && <div className="placeholder">생성하기 버튼을 클릭하세요.</div>}
+                                            {!resultUrl && !isLoading && !error && <div className="placeholder">생성하기 버튼을 클릭하세요.</div>}
                                         </div>
                                     </div>
                                 </div>

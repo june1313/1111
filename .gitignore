@@ -1,5 +1,17 @@
+# Dependencies
 /node_modules
-static/
-venv/
+/.venv
+/backend/.venv
+
+# Build output
 /dist
-.DS_Store
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
