@@ -538,25 +538,3 @@ body {
     cursor: nwse-resize;
     box-shadow: 0 0 5px rgba(0,0,0,0.2);
 }
-
-/* 버블 메뉴 */
-.bubble-menu {
-    display: flex;
-    background-color: var(--text-primary);
-    color: white;
-    padding: 4px 8px;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-}
-
-.bubble-menu button {
-    background: none;
-    border: none;
-    color: white;
-    padding: 6px;
-    border-radius: 4px;
-}
-
-.bubble-menu button.is-active {
-    background-color: rgba(255, 255, 255, 0.2);
-}
