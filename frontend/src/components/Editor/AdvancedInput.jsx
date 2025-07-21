@@ -12,7 +12,7 @@ import TextAlign from '@tiptap/extension-text-align';
 import FontFamily from '@tiptap/extension-font-family';
 import Youtube from '@tiptap/extension-youtube';
 import FontSize from 'tiptap-extension-font-size';
-import Underline from '@tiptap/extension-underline'; // Underline 확장 기능 import
+import Underline from '@tiptap/extension-underline';
 
 import {
   Bold, Italic, Strikethrough, Underline as UnderlineIcon, List, Quote, Paintbrush,

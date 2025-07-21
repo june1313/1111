@@ -11,7 +11,7 @@ import json
 # ==============================================================================
 
 # 기본 부정 프롬프트 (네거티브 프롬프트)
-NEGATIVE_PROMPT = "worst quality, low quality, jpeg artifacts, blurry, distorted, ugly, tiling, poorly drawn, disfigured, out of frame, extra limbs,amateur photography,gloomy, bad anatomy, watermark, text, signature, clutter, messy, low-resolution"
+NEGATIVE_PROMPT = "worst quality, low quality, jpeg artifacts, blurry, distorted, ugly, tiling, poorly drawn, disfigured, out of frame, extra limbs,amateur photography,gloomy, bad anatomy, watermark, text, signature, clutter, messy, low-resolution, cars"
 
 # 스타일 및 방 구조별 긍정 프롬프트 템플릿
 STYLE_PROMPTS = {
