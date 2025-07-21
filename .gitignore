@@ -8,6 +8,9 @@
 # Vite / Development
 /frontend/.vite/
 
+# Uploaded assets
+/backend/static/images/
+
 # Log files
 /frontend/npm-debug.log*
 /frontend/yarn-debug.log*
