@@ -2,6 +2,7 @@
 /node_modules
 /.venv
 /backend/.venv
+/backend/static/images/
 
 # Build output
 /dist

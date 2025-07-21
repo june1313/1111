@@ -1,120 +1,94 @@
+// src/AdvancedInput.jsx
+
 import React, { useRef, useCallback } from 'react';
 import { useEditor, EditorContent, ReactNodeViewRenderer } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { Color } from '@tiptap/extension-color';
 import { TextStyle } from '@tiptap/extension-text-style';
 import Image from '@tiptap/extension-image';
-import { Table } from '@tiptap/extension-table';
-import { TableRow } from '@tiptap/extension-table-row';
-import { TableHeader } from '@tiptap/extension-table-header';
-import { TableCell } from '@tiptap/extension-table-cell';
-import Underline from '@tiptap/extension-underline';
+import { Table, TableCell, TableHeader, TableRow } from '@tiptap/extension-table';
 import Highlight from '@tiptap/extension-highlight';
 import TextAlign from '@tiptap/extension-text-align';
 import FontFamily from '@tiptap/extension-font-family';
-import Link from '@tiptap/extension-link';
 import Youtube from '@tiptap/extension-youtube';
+import FontSize from 'tiptap-extension-font-size';
+import Underline from '@tiptap/extension-underline'; // Underline 확장 기능 import
+
 import {
   Bold, Italic, Strikethrough, Underline as UnderlineIcon, List, Quote, Paintbrush,
-  AlignLeft, AlignCenter, AlignRight, Link2, Eraser, Highlighter, Youtube as YoutubeIcon,
-  Heading1, Heading2, Heading3, Pilcrow, Minus, Code, Undo, Redo, Image as ImageIcon
+  AlignLeft, AlignCenter, AlignRight, Link2, Eraser, Highlighter,
+  Minus, Code, Undo, Redo, Image as ImageIcon
 } from 'lucide-react';
-import { ResizableImage } from './ResizableImage'; 
+import { ResizableImage } from './ResizableImage';
 
-// 커스텀 이미지 확장: 리사이즈 기능 추가
 const CustomImage = Image.extend({
-  addAttributes() {
-    return {
-      ...this.parent?.(),
-      width: { default: null },
-    };
-  },
-  addNodeView() {
-    return ReactNodeViewRenderer(ResizableImage);
-  },
+  addAttributes() { return { ...this.parent?.(), width: { default: null } }; },
+  addNodeView() { return ReactNodeViewRenderer(ResizableImage); },
 });
 
 const FONT_FAMILY_OPTIONS = [
-  { label: '기본서체', value: '' },
-  { label: '나눔고딕', value: 'Nanum Gothic' },
-  { label: '맑은고딕', value: 'Malgun Gothic' },
-  { label: '돋움', value: 'Dotum' },
-  { label: '굴림', value: 'Gulim' },
-  { label: '바탕', value: 'Batang' },
+  { label: '기본서체', value: 'Inter' }, { label: '나눔고딕', value: 'Nanum Gothic' },
+  { label: '맑은고딕', value: 'Malgun Gothic' }, { label: '돋움', value: 'Dotum' },
 ];
-
+const FONT_SIZE_OPTIONS = ['12px', '14px', '16px', '18px', '20px', '24px', '30px', '36px'];
 const HIGHLIGHT_COLORS = ['#ffc078', '#82c91e', '#15aabf', '#cc5de8', null];
 
 function AdvancedInput({ userPrompt, setUserPrompt }) {
   const imageInputRef = useRef(null);
 
-  // 이미지 파일 처리 로직을 useCallback으로 통합하여 재사용성 증대
   const handleImageFiles = useCallback((files, view, coordinates) => {
     if (!files || files.length === 0) return;
-
-    Array.from(files)
-      .filter(file => file.type.startsWith("image/"))
-      .forEach(file => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const imageUrl = e.target.result;
-          if (!view || !imageUrl) return;
-
-          const { schema } = view.state;
-          const node = schema.nodes.image.create({ src: imageUrl });
-          
-          let transaction;
-          if (coordinates) { // 드래그 앤 드롭의 경우
-            transaction = view.state.tr.insert(coordinates.pos, node);
-          } else { // 붙여넣기 또는 파일 선택의 경우
-            transaction = view.state.tr.replaceSelectionWith(node);
-          }
-          view.dispatch(transaction);
-        };
-        reader.readAsDataURL(file);
-      });
+    Array.from(files).filter(file => file.type.startsWith("image/")).forEach(file => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const imageUrl = e.target.result;
+        if (!view || !imageUrl) return;
+        const { schema } = view.state;
+        const node = schema.nodes.image.create({ src: imageUrl });
+        let transaction;
+        if (coordinates) {
+          transaction = view.state.tr.insert(coordinates.pos, node);
+        } else {
+          transaction = view.state.tr.replaceSelectionWith(node);
+        }
+        view.dispatch(transaction);
+      };
+      reader.readAsDataURL(file);
+    });
   }, []);
 
   const editor = useEditor({
     extensions: [
-      StarterKit, TextStyle, FontFamily, Color, Underline, CustomImage,
-      Link.configure({ openOnClick: false }),
+      StarterKit.configure({
+        link: { openOnClick: false },
+        heading: { levels: [1, 2, 3] },
+        underline: false, // StarterKit의 기본 Underline 비활성화
+      }),
+      TextStyle, FontFamily, Color, CustomImage, FontSize, Underline, // 별도 Underline 확장 기능 추가
       Highlight.configure({ multicolor: true }),
       TextAlign.configure({ types: ['heading', 'paragraph'] }),
       Youtube.configure({ nocookie: true }),
       Table.configure({ resizable: true }), TableRow, TableHeader, TableCell,
     ],
     content: userPrompt,
-    onUpdate: ({ editor }) => setUserPrompt(editor.getHTML()),
+    onUpdate: ({ editor }) => {
+        setUserPrompt(editor.getHTML());
+    },
     editorProps: {
       attributes: { class: 'prose-mirror-editor' },
+      // 1. `_slice` 파라미터 제거
       handleDrop: function(view, event, _slice, moved) {
-        if (!moved && event.dataTransfer) {
-          // 로컬 이미지 파일 드롭 처리
-          if (event.dataTransfer.files.length > 0) {
-            event.preventDefault();
-            const coordinates = view.posAtCoords({ left: event.clientX, top: event.clientY });
-            handleImageFiles(event.dataTransfer.files, view, coordinates);
-            return true;
-          }
-          // 웹 이미지 드롭 처리
-          const htmlData = event.dataTransfer.getData('text/html');
-          if (htmlData) {
-            const tempElement = document.createElement('div');
-            tempElement.innerHTML = htmlData;
-            const imgElement = tempElement.querySelector('img');
-            if (imgElement?.src) {
-              event.preventDefault();
-              editor?.commands.setImage({ src: imgElement.src });
-              return true;
-            }
-          }
+        if (!moved && event.dataTransfer?.files.length > 0) {
+          event.preventDefault();
+          const coordinates = view.posAtCoords({ left: event.clientX, top: event.clientY });
+          handleImageFiles(event.dataTransfer.files, view, coordinates);
+          return true;
         }
         return false;
       },
-      handlePaste: function(view, event, slice) {
+      // 2. `_slice` 파라미터 제거
+      handlePaste: function(view, event) {
         if (event.clipboardData?.files.length > 0) {
-          event.preventDefault();
           handleImageFiles(event.clipboardData.files, view, null);
           return true;
         }
@@ -123,66 +97,104 @@ function AdvancedInput({ userPrompt, setUserPrompt }) {
     },
   });
 
-  if (!editor) {
-    return null;
-  }
+  if (!editor) { return null; }
 
   const setLink = () => {
-    const url = window.prompt('URL을 입력하세요');
-    if (url) editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
+    const previousUrl = editor.getAttributes('link').href;
+    const url = window.prompt('URL', previousUrl);
+    if (url === null) return;
+    if (url === '') {
+      editor.chain().focus().extendMarkRange('link').unsetLink().run();
+      return;
+    }
+    editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
   };
 
-  const addYoutubeVideo = () => {
-    const url = prompt('유튜브 영상 URL을 입력하세요');
-    if (url) editor.commands.setYoutubeVideo({ src: url });
-  };
-  
+
   const handleLocalImageSelect = (event) => {
     handleImageFiles(event.target.files, editor.view, null);
   };
 
   return (
     <div className="editor-wrapper advanced-editor">
+      {/* 3. 툴바를 하나로 통합하고 아이콘 그룹핑 */}
       <div className="editor-toolbar">
+        {/* 실행 취소/다시 실행 */}
         <button onClick={() => editor.chain().focus().undo().run()} disabled={!editor.can().undo()}><Undo size={18} /></button>
         <button onClick={() => editor.chain().focus().redo().run()} disabled={!editor.can().redo()}><Redo size={18} /></button>
         <div className="toolbar-separator"></div>
 
-        <select className="toolbar-select" onChange={(e) => editor.chain().focus().setFontFamily(e.target.value).run()} value={editor.getAttributes('textStyle').fontFamily || ''}>
-          {FONT_FAMILY_OPTIONS.map(font => <option key={font.label} value={font.value}>{font.label}</option>)}
+        {/* 텍스트 스타일 */}
+        <select
+          className="toolbar-select"
+          onChange={(e) => {
+            const value = e.target.value;
+            if (value === 'p') editor.chain().focus().setParagraph().run();
+            else if (value === 'quote') editor.chain().focus().toggleBlockquote().run();
+            else editor.chain().focus().toggleHeading({ level: parseInt(value.replace('h', '')) }).run();
+          }}
+          value={
+            editor.isActive('heading', { level: 1 }) ? 'h1' :
+            editor.isActive('heading', { level: 2 }) ? 'h2' :
+            editor.isActive('heading', { level: 3 }) ? 'h3' :
+            editor.isActive('blockquote') ? 'quote' : 'p'
+          }
+        >
+          <option value="p">본문</option>
+          <option value="h1">제목 1</option>
+          <option value="h2">제목 2</option>
+          <option value="h3">제목 3</option>
+          <option value="quote">인용구</option>
         </select>
-        <input type="number" className="toolbar-number-input" onChange={(e) => editor.chain().focus().setFontSize(`${e.target.value}px`).run()} defaultValue="16" />
+        <select className="toolbar-select" onChange={(e) => editor.chain().focus().setFontFamily(e.target.value).run()} value={editor.getAttributes('textStyle').fontFamily || 'Inter'}>
+            {FONT_FAMILY_OPTIONS.map(font => <option key={font.label} value={font.value}>{font.label}</option>)}
+        </select>
+        <select
+            className="toolbar-select font-size-select"
+            value={editor.getAttributes('textStyle').fontSize || '16px'}
+            onChange={(e) => editor.chain().focus().setFontSize(e.target.value).run()}
+        >
+            {FONT_SIZE_OPTIONS.map(size => <option key={size} value={size}>{size.replace('px', '')}</option>)}
+        </select>
+        <div className="toolbar-separator"></div>
+        
+        {/* 텍스트 포맷팅 */}
+        <button onClick={() => editor.chain().focus().toggleBold().run()} className={editor.isActive('bold') ? 'is-active' : ''}><Bold size={18} /></button>
+        <button onClick={() => editor.chain().focus().toggleItalic().run()} className={editor.isActive('italic') ? 'is-active' : ''}><Italic size={18} /></button>
+        <button onClick={() => editor.chain().focus().toggleUnderline().run()} className={editor.isActive('underline') ? 'is-active' : ''}><UnderlineIcon size={18} /></button>
+        <button onClick={() => editor.chain().focus().toggleStrike().run()} className={editor.isActive('strike') ? 'is-active' : ''}><Strikethrough size={18} /></button>
+        <button onClick={setLink} className={editor.isActive('link') ? 'is-active' : ''}><Link2 size={18} /></button>
         <div className="toolbar-separator"></div>
 
-        <button onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()} className={editor.isActive('heading', { level: 1 }) ? 'is-active' : ''}><Heading1 size={18} /></button>
-        {/* ... (이하 다른 툴바 버튼들은 동일) ... */}
+        {/* 텍스트 정렬 및 리스트 */}
+        <button onClick={() => editor.chain().focus().setTextAlign('left').run()} className={editor.isActive({ textAlign: 'left' }) ? 'is-active' : ''}><AlignLeft size={18} /></button>
+        <button onClick={() => editor.chain().focus().setTextAlign('center').run()} className={editor.isActive({ textAlign: 'center' }) ? 'is-active' : ''}><AlignCenter size={18} /></button>
         <button onClick={() => editor.chain().focus().setTextAlign('right').run()} className={editor.isActive({ textAlign: 'right' }) ? 'is-active' : ''}><AlignRight size={18} /></button>
+        <button onClick={() => editor.chain().focus().toggleBulletList().run()} className={editor.isActive('bulletList') ? 'is-active' : ''}><List size={18} /></button>
         <div className="toolbar-separator"></div>
-
-        <button onClick={() => editor.chain().focus().toggleCodeBlock().run()} className={editor.isActive('codeBlock') ? 'is-active' : ''}><Code size={18} /></button>
-        <button onClick={() => editor.chain().focus().setHorizontalRule().run()}><Minus size={18} /></button>
-        <button onClick={addYoutubeVideo}><YoutubeIcon size={18} /></button>
-        <button onClick={() => imageInputRef.current?.click()}><ImageIcon size={18} /></button>
-        <input type="file" accept="image/*" ref={imageInputRef} style={{ display: 'none' }} onChange={handleLocalImageSelect} multiple />
-      </div>
-      <div className="editor-toolbar color-toolbar">
+        
+        {/* 색상 및 하이라이트 */}
         <Paintbrush size={18} />
-        {['#000000', '#e03131', '#2f9e44', '#1971c2', '#f08c00'].map(color => (
-          <button key={color} onClick={() => editor.chain().focus().setColor(color).run()} className={editor.isActive('textStyle', { color }) ? 'is-active' : ''} style={{ backgroundColor: color }} />
+        {['#000000', '#e03131', '#2f9e44', '#1971c2', '#f08c00', '#862e9c'].map(color => (
+            <button key={color} onClick={() => editor.chain().focus().setColor(color).run()} className={`color-swatch ${editor.isActive('textStyle', { color }) ? 'is-active' : ''}`} style={{ backgroundColor: color }} />
         ))}
         <div className="toolbar-separator"></div>
         <Highlighter size={18} />
         {HIGHLIGHT_COLORS.map((color, index) => (
-          <button
-            key={index}
-            onClick={() => editor.chain().focus().toggleHighlight({ color }).run()}
-            className={editor.isActive('highlight', { color }) ? 'is-active' : ''}
-          >
-            {color ? <div className="highlight-swatch" style={{ backgroundColor: color }} /> : <Eraser size={14} />}
-          </button>
+            <button key={index} onClick={() => editor.chain().focus().toggleHighlight({ color }).run()} className={`highlight-swatch ${editor.isActive('highlight', { color }) ? 'is-active' : ''}`}>
+              {color ? <div className="highlight-color" style={{ backgroundColor: color }} /> : <Eraser size={14} />}
+            </button>
         ))}
+        <div className="toolbar-separator"></div>
+        
+        {/* 삽입 */}
+        <button onClick={() => editor.chain().focus().setHorizontalRule().run()} title="구분선"><Minus size={18} /></button>
+        <button onClick={() => editor.chain().focus().toggleCodeBlock().run()} className={editor.isActive('codeBlock') ? 'is-active' : ''} title="코드블록"><Code size={18} /></button>
+        <button onClick={() => imageInputRef.current?.click()} title="이미지"><ImageIcon size={18} /></button>
+        {/* 4. 유튜브 아이콘 버튼 제거 (기능은 `addYoutubeVideo` 함수에 남아있음) */}
       </div>
       <EditorContent editor={editor} />
+      <input type="file" accept="image/*" ref={imageInputRef} style={{ display: 'none' }} onChange={handleLocalImageSelect} multiple />
     </div>
   );
 }

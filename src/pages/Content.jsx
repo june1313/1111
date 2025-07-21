@@ -19,7 +19,6 @@ function Content({ activeTool }) {
     const [error, setError] = useState(null);
     const [showCompareSlider, setShowCompareSlider] = useState(false);
 
-    // '원본' 이미지 파일이 변경되었을 때의 핸들러
     const handleMainImageChange = (file) => {
         if (file) {
             setImageFile(file);
@@ -29,12 +28,11 @@ function Content({ activeTool }) {
             setShowCompareSlider(false);
         }
     };
-    
+
     const handleImageUpload = (event) => {
         handleMainImageChange(event.target.files?.[0]);
     };
-    
-    // 오른쪽 패널의 드래그 앤 드롭 핸들러
+
     const handleDragOver = (event) => {
         event.preventDefault();
         setIsDragging(true);
@@ -112,7 +110,6 @@ function Content({ activeTool }) {
             </div>
 
             <div className="main-layout">
-                {/* 왼쪽 컨트롤 패널 */}
                 <div className="controls-panel">
                     <h3>
                         <span className="material-symbols-outlined">tune</span>
@@ -151,7 +148,6 @@ function Content({ activeTool }) {
                     </div>
                 </div>
 
-                {/* 오른쪽 이미지 패널 (원본 이미지 업로드 기능) */}
                 <div className="image-panel">
                     {!previewUrl ? (
                         <div
