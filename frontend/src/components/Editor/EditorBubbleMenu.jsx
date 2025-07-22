@@ -1,8 +1,20 @@
-// EditorBubbleMenu.jsx 수정
+// EditorBubbleMenu.jsx
 
 import React, { useState, useCallback, useRef } from 'react';
 import { BubbleMenu } from '@tiptap/react';
 import { Bold, Italic, Underline as UnderlineIcon, Strikethrough, Code, Link2, Trash2 } from 'lucide-react';
+
+// === 재사용 가능한 버블 메뉴 버튼 컴포넌트 ===
+// ToolbarButton과 유사하게, 버블 메뉴 내의 각 버튼에 대한 공통 로직을 캡슐화합니다.
+const BubbleMenuButton = ({ editor, commandName, onClickCommand, isActive, icon: Icon }) => (
+  <button
+    onClick={() => onClickCommand ? onClickCommand() : editor.chain().focus()[commandName]().run()}
+    className={isActive ? 'is-active' : ''}
+  >
+    <Icon size={16} /> {/* 버블 메뉴 아이콘은 16px로 줄였습니다 */}
+  </button>
+);
+
 
 const EditorBubbleMenu = ({ editor }) => {
   const [isLinkEditorOpen, setIsLinkEditorOpen] = useState(false);
@@ -14,31 +26,30 @@ const EditorBubbleMenu = ({ editor }) => {
 
   const setLink = useCallback(() => {
     if (!editor) return;
-    let url = linkInputRef.current?.value; // 입력 필드의 값 가져오기
+    let url = linkInputRef.current?.value;
 
     if (url === null) {
       return;
     }
 
     if (url && !url.startsWith('http://') && !url.startsWith('https://')) {
-      url = `https://${url}`; // http/https 없으면 https:// 강제 추가
+      url = `https://${url}`;
     }
-    // ✨ ✨ ✨ 추가 끝 ✨ ✨ ✨
 
-    if (url === '') { // 빈 문자열인 경우 링크 해제
+    if (url === '') {
       editor.chain().focus().extendMarkRange('link').unsetLink().run();
-    } else { // URL이 있는 경우 링크 설정
+    } else {
       editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
     }
     setIsLinkEditorOpen(false);
   }, [editor]);
 
-  const handleLinkInputKeyDown = (e) => {
+  const handleLinkInputKeyDown = useCallback((e) => {
     if (e.key === 'Enter') {
       e.preventDefault();
       setLink();
     }
-  };
+  }, [setLink]);
 
   if (!editor) {
     return null;
@@ -70,7 +81,7 @@ const EditorBubbleMenu = ({ editor }) => {
         </div>
       ) : (
         <div className="bubble-menu-buttons">
-          {/* 블록 타입 및 텍스트 서식 */}
+          {/* 블록 타입 드롭다운 그룹 */}
           <div className="button-group">
             <select
               className="toolbar-select bubble-select"
@@ -92,24 +103,16 @@ const EditorBubbleMenu = ({ editor }) => {
             </select>
           </div>
 
+          {/* 텍스트 포맷팅 버튼 그룹 (Bold, Italic, Underline, Strikethrough, Code) */}
           <div className="button-group">
-            <button onClick={() => editor.chain().focus().toggleBold().run()} className={editor.isActive('bold') ? 'is-active' : ''}>
-              <Bold size={16} />
-            </button>
-            <button onClick={() => editor.chain().focus().toggleItalic().run()} className={editor.isActive('italic') ? 'is-active' : ''}>
-              <Italic size={16} />
-            </button>
-            <button onClick={() => editor.chain().focus().toggleUnderline().run()} className={editor.isActive('underline') ? 'is-active' : ''}>
-              <UnderlineIcon size={16} />
-            </button>
-            <button onClick={() => editor.chain().focus().toggleStrike().run()} className={editor.isActive('strike') ? 'is-active' : ''}>
-              <Strikethrough size={16} />
-            </button>
-            <button onClick={() => editor.chain().focus().toggleCode().run()} className={editor.isActive('code') ? 'is-active' : ''}>
-              <Code size={16} />
-            </button>
+            <BubbleMenuButton editor={editor} commandName="toggleBold" isActive={editor.isActive('bold')} icon={Bold} />
+            <BubbleMenuButton editor={editor} commandName="toggleItalic" isActive={editor.isActive('italic')} icon={Italic} />
+            <BubbleMenuButton editor={editor} commandName="toggleUnderline" isActive={editor.isActive('underline')} icon={UnderlineIcon} />
+            <BubbleMenuButton editor={editor} commandName="toggleStrike" isActive={editor.isActive('strike')} icon={Strikethrough} />
+            <BubbleMenuButton editor={editor} commandName="toggleCode" isActive={editor.isActive('code')} icon={Code} />
           </div>
 
+          {/* 링크 관련 버튼 그룹 (링크 설정, 링크 해제) */}
           <div className="button-group">
             <button onClick={toggleLinkEditor} className={editor.isActive('link') ? 'is-active' : ''}>
               <Link2 size={16} />
