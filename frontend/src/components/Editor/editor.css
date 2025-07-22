@@ -285,3 +285,20 @@
 .toolbar-select.bubble-select:hover {
     background-color: #555;
 }
+
+.prose-mirror-editor a {
+    color: var(--google-blue); /* Google Blue 색상 변수 사용 */
+    text-decoration: underline; /* 밑줄 추가 */
+    cursor: pointer; /* 마우스 오버 시 포인터 변경 */
+}
+
+/* 링크에 마우스 올렸을 때 */
+.prose-mirror-editor a:hover {
+    text-decoration: none; /* 밑줄 제거 또는 다른 효과 */
+    color: #1a5abc; /* Hover 시 색상 변경 */
+}
+
+.prose-mirror-editor .ProseMirror-selectedtext a {
+    background-color: rgba(0, 123, 255, 0.2); 
+    border-radius: 2px; 
+}

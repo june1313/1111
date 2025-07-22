@@ -14,25 +14,21 @@ import Table from '@tiptap/extension-table';
 import TableCell from '@tiptap/extension-table-cell';
 import TableHeader from '@tiptap/extension-table-header';
 import TableRow from '@tiptap/extension-table-row';
+import Link from '@tiptap/extension-link'; // ✨ 이 부분을 새로 import 해야 합니다!
 
 // 분리된 컴포넌트들을 import 합니다.
-import Toolbar from './Toolbar'; 
+import Toolbar from './Toolbar';
 import EditorBubbleMenu from './EditorBubbleMenu';
 import { ResizableImage } from './ResizableImage';
 
-// ✨ 가장 중요한 부분: 새로 만든 editor.css 파일을 여기서 불러옵니다.
-import './editor.css';
+import './editor.css'; // editor.css 불러오기
 
-// 커스텀 이미지 확장은 에디터 설정의 일부이므로 여기에 둡니다.
 const CustomImage = Image.extend({
   addAttributes() { return { ...this.parent?.(), width: { default: null } }; },
   addNodeView() { return ReactNodeViewRenderer(ResizableImage); },
 });
 
-// 컴포넌트 이름을 역할에 맞게 변경합니다. (예: TiptapEditor)
 function TiptapEditor({ userPrompt, setUserPrompt }) {
-
-  // 이미지 파일 처리 로직은 에디터의 핵심 기능과 관련이 깊으므로 여기에 둡니다.
   const handleImageFiles = useCallback((files, view, coordinates) => {
     if (!files || files.length === 0) return;
     Array.from(files).filter(file => file.type.startsWith("image/")).forEach(file => {
@@ -57,9 +53,14 @@ function TiptapEditor({ userPrompt, setUserPrompt }) {
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
-        link: { openOnClick: false },
+        // link: { openOnClick: false }, // ✨ 여기는 주석 처리하거나 제거하세요. 아래 Link 확장에서 설정합니다.
         heading: { levels: [1, 2, 3] },
-        underline: false, 
+        underline: false,
+      }),
+      // ✨ 이 부분이 핵심: Link 확장 기능을 추가합니다.
+      Link.configure({
+        openOnClick: false, // 에디터 내에서 클릭 시 바로 이동하지 않게 (handleDOMEvents에서 제어)
+        autolink: true, // URL처럼 보이는 텍스트를 자동으로 링크로 변환할지 여부
       }),
       TextStyle, FontFamily, Color, CustomImage, FontSize, Underline,
       Highlight.configure({ multicolor: true }),
@@ -89,6 +90,26 @@ function TiptapEditor({ userPrompt, setUserPrompt }) {
         }
         return false;
       },
+      handleDOMEvents: {
+        click: (view, event) => {
+          const target = event.target;
+          if (target && target.tagName === 'A' && target.href) {
+            // Shift, Ctrl/Cmd 키와 함께 클릭했을 때만 링크 열기
+            if (event.shiftKey || event.ctrlKey || event.metaKey) {
+              window.open(target.href, '_blank');
+              event.preventDefault();
+              return true;
+            }
+            // (선택 사항) Shift/Ctrl/Cmd 키 없이 단순 클릭 시에도 링크를 열려면 이 부분을 활성화
+            else {
+              window.open(target.href, '_blank');
+              event.preventDefault();
+              return true;
+            }
+          }
+          return false;
+        },
+      },
     },
   });
 
@@ -96,7 +117,6 @@ function TiptapEditor({ userPrompt, setUserPrompt }) {
 
   return (
     <div className="editor-wrapper">
-      {/* advanced-editor 클래스는 이제 불필요하므로 제거해도 됩니다. */}
       <Toolbar editor={editor} handleImageFiles={handleImageFiles} />
       <EditorBubbleMenu editor={editor} />
       <EditorContent editor={editor} />

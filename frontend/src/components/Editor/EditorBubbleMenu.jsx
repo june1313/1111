@@ -1,30 +1,42 @@
-// EditorBubbleMenu.jsx
+// EditorBubbleMenu.jsx 수정
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { BubbleMenu } from '@tiptap/react';
 import { Bold, Italic, Underline as UnderlineIcon, Strikethrough, Code, Link2, Trash2 } from 'lucide-react';
 
 const EditorBubbleMenu = ({ editor }) => {
   const [isLinkEditorOpen, setIsLinkEditorOpen] = useState(false);
+  const linkInputRef = useRef(null);
 
   const toggleLinkEditor = useCallback(() => {
     setIsLinkEditorOpen(prevState => !prevState);
   }, []);
 
-  const setLink = useCallback((url) => {
-    if (url === null) return;
-    if (url === '') {
-      editor.chain().focus().extendMarkRange('link').unsetLink().run();
+  const setLink = useCallback(() => {
+    if (!editor) return;
+    let url = linkInputRef.current?.value; // 입력 필드의 값 가져오기
+
+    if (url === null) {
       return;
     }
-    editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
+
+    if (url && !url.startsWith('http://') && !url.startsWith('https://')) {
+      url = `https://${url}`; // http/https 없으면 https:// 강제 추가
+    }
+    // ✨ ✨ ✨ 추가 끝 ✨ ✨ ✨
+
+    if (url === '') { // 빈 문자열인 경우 링크 해제
+      editor.chain().focus().extendMarkRange('link').unsetLink().run();
+    } else { // URL이 있는 경우 링크 설정
+      editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
+    }
     setIsLinkEditorOpen(false);
   }, [editor]);
 
   const handleLinkInputKeyDown = (e) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      setLink(e.target.value);
+      setLink();
     }
   };
 
@@ -47,9 +59,10 @@ const EditorBubbleMenu = ({ editor }) => {
             defaultValue={editor.getAttributes('link').href || ''}
             onKeyDown={handleLinkInputKeyDown}
             className="link-input"
+            ref={linkInputRef}
           />
           <button
-            onClick={() => setLink(document.querySelector('.link-input').value)}
+            onClick={setLink}
             className="link-apply-button"
           >
             적용
@@ -64,7 +77,7 @@ const EditorBubbleMenu = ({ editor }) => {
               onChange={(e) => {
                 const value = e.target.value;
                 if (value === 'p') editor.chain().focus().setParagraph().run();
-                else editor.chain().focus().toggleHeading({ level: parseInt(value.replace('h', '')) }).run();
+                else editor.chain().focus().toggleHeading({ level: parseInt(value.replace('h', ''), 10) }).run();
               }}
               value={
                 editor.isActive('heading', { level: 1 }) ? 'h1' :
