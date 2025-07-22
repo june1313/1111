@@ -76,7 +76,6 @@ function AdvancedInput({ userPrompt, setUserPrompt }) {
     },
     editorProps: {
       attributes: { class: 'prose-mirror-editor' },
-      // 1. `_slice` 파라미터 제거
       handleDrop: function(view, event, _slice, moved) {
         if (!moved && event.dataTransfer?.files.length > 0) {
           event.preventDefault();
@@ -86,7 +85,6 @@ function AdvancedInput({ userPrompt, setUserPrompt }) {
         }
         return false;
       },
-      // 2. `_slice` 파라미터 제거
       handlePaste: function(view, event) {
         if (event.clipboardData?.files.length > 0) {
           handleImageFiles(event.clipboardData.files, view, null);

@@ -92,20 +92,22 @@ def handle_generate_image():
         positive_prompt = f"{user_prompt}, {base_style_prompt.format(exterior_type=exterior_type)}"
         
         controlnet_args = [
-            { # ControlNet Unit 0: MLSD
-                "enabled": True, "input_image": init_image_base64, "pixel_perfect": True,
-                "module": "mlsd", "model": "control_v11p_sd15_mlsd [aca30ff0]",
-                "weight": 1.3,
-                "control_mode": "ControlNet is more important",
-                "threshold_a": 0.1, "threshold_b": 0.1
-            },
-            { # ControlNet Unit 1: Depth
-                "enabled": True, "input_image": init_image_base64, "pixel_perfect": True,
-                "module": "depth_midas", "model": "control_v11f1p_sd15_depth [cfd03158]",
-                "weight": 1.3,
-                "control_mode": "ControlNet is more important"
-            }
-        ]
+        { # ControlNet Unit 0: MLSD
+            "enabled": True, "input_image": init_image_base64, "pixel_perfect": True,
+            "module": "mlsd", "model": "control_v11p_sd15_mlsd [aca30ff0]",
+            "weight": 1.3,
+            "control_mode": "ControlNet is more important",
+            "threshold_a": 0.1, "threshold_b": 0.1,
+            "resize_mode": "Crop and resize" # ✨ 이미지 찌그러짐 방지 설정 추가
+        },
+        { # ControlNet Unit 1: Depth
+            "enabled": True, "input_image": init_image_base64, "pixel_perfect": True,
+            "module": "depth_midas", "model": "control_v11f1p_sd15_depth [cfd03158]",
+            "weight": 1.3,
+            "control_mode": "ControlNet is more important",
+            "resize_mode": "Crop and resize" # ✨ 이미지 찌그러짐 방지 설정 추가
+        }
+    ]
         
     else: # --- 인테리어 로직 (Canny) ---
         room_type = form_data.get('room_type', 'living room')
