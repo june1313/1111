@@ -1,15 +1,14 @@
 {
-  "name": "frontend",
-  "version": "1.0.0",
-  "description": "",
-  "main": "eslint.config.js",
+  "name": "ai-remodeling-app",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
   "dependencies": {
     "@tiptap/core": "^2.26.1",
     "@tiptap/extension-color": "^2.26.1",
@@ -18,6 +17,9 @@
     "@tiptap/extension-image": "^2.26.1",
     "@tiptap/extension-link": "^2.26.1",
     "@tiptap/extension-table": "^2.26.1",
+    "@tiptap/extension-table-cell": "^2.26.1",
+    "@tiptap/extension-table-header": "^2.26.1",
+    "@tiptap/extension-table-row": "^2.26.1",
     "@tiptap/extension-text-align": "^2.26.1",
     "@tiptap/extension-text-style": "^2.26.1",
     "@tiptap/extension-underline": "^2.26.1",
@@ -34,9 +36,9 @@
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "@vitejs/plugin-react": "^4.7.0",
-    "eslint": "^9.31.0",
-    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint": "^8.57.1",
+    "eslint-plugin-react-hooks": "^4.6.2",
     "eslint-plugin-react-refresh": "^0.4.20",
-    "vite": "^7.0.5"
+    "vite": "^5.4.19"
   }
 }

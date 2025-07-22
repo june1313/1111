@@ -1,18 +1,19 @@
-// src/AdvancedInput.jsx
-
 import React, { useRef, useCallback } from 'react';
 import { useEditor, EditorContent, ReactNodeViewRenderer } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { Color } from '@tiptap/extension-color';
 import { TextStyle } from '@tiptap/extension-text-style';
 import Image from '@tiptap/extension-image';
-import { Table, TableCell, TableHeader, TableRow } from '@tiptap/extension-table';
 import Highlight from '@tiptap/extension-highlight';
 import TextAlign from '@tiptap/extension-text-align';
 import FontFamily from '@tiptap/extension-font-family';
 import Youtube from '@tiptap/extension-youtube';
 import FontSize from 'tiptap-extension-font-size';
 import Underline from '@tiptap/extension-underline';
+import Table from '@tiptap/extension-table';
+import TableCell from '@tiptap/extension-table-cell';
+import TableHeader from '@tiptap/extension-table-header';
+import TableRow from '@tiptap/extension-table-row';
 
 import {
   Bold, Italic, Strikethrough, Underline as UnderlineIcon, List, Quote, Paintbrush,
@@ -62,9 +63,9 @@ function AdvancedInput({ userPrompt, setUserPrompt }) {
       StarterKit.configure({
         link: { openOnClick: false },
         heading: { levels: [1, 2, 3] },
-        underline: false, // StarterKit의 기본 Underline 비활성화
+        underline: false,
       }),
-      TextStyle, FontFamily, Color, CustomImage, FontSize, Underline, // 별도 Underline 확장 기능 추가
+      TextStyle, FontFamily, Color, CustomImage, FontSize, Underline,
       Highlight.configure({ multicolor: true }),
       TextAlign.configure({ types: ['heading', 'paragraph'] }),
       Youtube.configure({ nocookie: true }),
@@ -115,7 +116,6 @@ function AdvancedInput({ userPrompt, setUserPrompt }) {
 
   return (
     <div className="editor-wrapper advanced-editor">
-      {/* 3. 툴바를 하나로 통합하고 아이콘 그룹핑 */}
       <div className="editor-toolbar">
         {/* 실행 취소/다시 실행 */}
         <button onClick={() => editor.chain().focus().undo().run()} disabled={!editor.can().undo()}><Undo size={18} /></button>
@@ -189,7 +189,6 @@ function AdvancedInput({ userPrompt, setUserPrompt }) {
         <button onClick={() => editor.chain().focus().setHorizontalRule().run()} title="구분선"><Minus size={18} /></button>
         <button onClick={() => editor.chain().focus().toggleCodeBlock().run()} className={editor.isActive('codeBlock') ? 'is-active' : ''} title="코드블록"><Code size={18} /></button>
         <button onClick={() => imageInputRef.current?.click()} title="이미지"><ImageIcon size={18} /></button>
-        {/* 4. 유튜브 아이콘 버튼 제거 (기능은 `addYoutubeVideo` 함수에 남아있음) */}
       </div>
       <EditorContent editor={editor} />
       <input type="file" accept="image/*" ref={imageInputRef} style={{ display: 'none' }} onChange={handleLocalImageSelect} multiple />
