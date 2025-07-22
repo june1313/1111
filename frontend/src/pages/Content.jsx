@@ -1,16 +1,40 @@
-// src/Content.jsx
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactCompareImage from 'react-compare-image';
-import AdvancedInput from '../components/Editor/AdvancedInput'; 
-import '../styles/App.css';                                 
-const STYLES = ["모던", "미니멀리스트", "스칸디나비아", "보헤미안", "인더스트리얼", "코스탈"];
-const ROOM_TYPES = ["거실", "침실", "주방", "화장실", "다이닝 룸", "홈 오피스", "파티오"];
+import AdvancedInput from '../components/Editor/AdvancedInput';
+import { generateImage } from '../api/imageApi'; 
+import '../styles/App.css';
+
+// 옵션 정의
+const INTERIOR_STYLES = [
+  { value: 'Modern', label: '모던' }, { value: 'Minimalist', label: '미니멀' },
+  { value: 'Scandinavian', label: '북유럽' }, { value: 'Bohemian', label: '보헤미안' },
+  { value: 'Industrial', label: '인더스트리얼' }, { value: 'Coastal', label: '해안' },
+];
+const ROOM_TYPES = [
+  { value: 'living room', label: '거실' }, { value: 'bedroom', label: '침실' },
+  { value: 'kitchen', label: '주방' }, { value: 'bathroom', label: '욕실' },
+  { value: 'office', label: '사무실' },
+];
+const EXTERIOR_STYLES = [
+  { value: 'Modern Minimalist', label: '모던 미니멀' }, { value: 'Classic Grandeur', label: '클래식' },
+  { value: 'Futuristic Concept', label: '미래지향' },
+];
+const EXTERIOR_TYPES = [
+  { value: 'a commercial building', label: '빌딩' }, { value: 'a detached house', label: '단독주택' },
+  { value: 'an apartment complex', label: '아파트' }, { value: 'a traditional hanok', label: '한옥' },
+  { value: 'a modern villa', label: '빌라' },
+];
 
 function Content({ activeTool }) {
-    const [style, setStyle] = useState('모던');
-    const [roomType, setRoomType] = useState('거실');
+    const isInterior = activeTool === 'Interior';
+    const currentStyles = isInterior ? INTERIOR_STYLES : EXTERIOR_STYLES;
+    const currentTypes = isInterior ? ROOM_TYPES : EXTERIOR_TYPES;
+    const typeLabel = isInterior ? "2. 공간 유형 선택" : "2. 건물 유형 선택";
+
+    const [style, setStyle] = useState(currentStyles[0].value);
+    const [selectedType, setSelectedType] = useState(currentTypes[0].value);
     const [userPrompt, setUserPrompt] = useState('');
+    
     const [imageFile, setImageFile] = useState(null);
     const [previewUrl, setPreviewUrl] = useState('');
     const [resultUrl, setResultUrl] = useState('');
@@ -18,6 +42,12 @@ function Content({ activeTool }) {
     const [isDragging, setIsDragging] = useState(false);
     const [error, setError] = useState(null);
     const [showCompareSlider, setShowCompareSlider] = useState(false);
+
+    useEffect(() => {
+        handleStartNew();
+        setStyle(currentStyles[0].value);
+        setSelectedType(currentTypes[0].value);
+    }, [activeTool, currentStyles, currentTypes]);
 
     const handleMainImageChange = (file) => {
         if (file) {
@@ -29,20 +59,9 @@ function Content({ activeTool }) {
         }
     };
 
-    const handleImageUpload = (event) => {
-        handleMainImageChange(event.target.files?.[0]);
-    };
-
-    const handleDragOver = (event) => {
-        event.preventDefault();
-        setIsDragging(true);
-    };
-
-    const handleDragLeave = (event) => {
-        event.preventDefault();
-        setIsDragging(false);
-    };
-
+    const handleImageUpload = (event) => handleMainImageChange(event.target.files?.[0]);
+    const handleDragOver = (event) => { event.preventDefault(); setIsDragging(true); };
+    const handleDragLeave = (event) => { event.preventDefault(); setIsDragging(false); };
     const handleDrop = (event) => {
         event.preventDefault();
         setIsDragging(false);
@@ -61,22 +80,18 @@ function Content({ activeTool }) {
 
         const formData = new FormData();
         formData.append('imageFile', imageFile);
-        formData.append('style', style);
-        formData.append('room_type', roomType);
         formData.append('prompt', userPrompt);
+        formData.append('style', style);
+        formData.append('tool', activeTool);
+        if (isInterior) {
+            formData.append('room_type', selectedType);
+        } else {
+            formData.append('exterior_type', selectedType);
+        }
 
         try {
-            const response = await fetch('http://localhost:5000/api/generate', {
-                method: 'POST',
-                body: formData,
-            });
-
-            if (!response.ok) {
-                const errData = await response.json();
-                throw new Error(errData.error || `HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
+            const data = await generateImage(formData);
+            
             if (data.imageUrl) {
                 setResultUrl(data.imageUrl);
             } else {
@@ -96,16 +111,16 @@ function Content({ activeTool }) {
         setError(null);
         setShowCompareSlider(false);
         setUserPrompt('');
+        const fileInput = document.getElementById('imageUploadInput');
+        if(fileInput) fileInput.value = '';
     };
 
-    const toggleCompareSlider = () => {
-        setShowCompareSlider(!showCompareSlider);
-    };
+    const toggleCompareSlider = () => setShowCompareSlider(!showCompareSlider);
 
     return (
         <main className="content">
             <div className="content-header">
-                <h1>{activeTool === 'Interior' ? "인테리어 AI 디자이너" : "익스테리어 AI 디자이너"}</h1>
+                <h1>{isInterior ? "인테리어 AI 디자이너" : "익스테리어 AI 디자이너"}</h1>
                 <p>사진 한 장으로 몇 초 만에 공간을 바꿔보세요. AI의 힘이 당신 손끝에 있습니다.</p>
             </div>
 
@@ -118,21 +133,18 @@ function Content({ activeTool }) {
                     <div className="form-group">
                         <label>1. 스타일 선택</label>
                         <select value={style} onChange={(e) => setStyle(e.target.value)}>
-                            {STYLES.map(s => <option key={s} value={s}>{s}</option>)}
+                            {currentStyles.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
                         </select>
                     </div>
                     <div className="form-group">
-                        <label>2. 공간 유형 선택</label>
-                        <select value={roomType} onChange={(e) => setRoomType(e.target.value)}>
-                            {ROOM_TYPES.map(r => <option key={r} value={r}>{r.charAt(0).toUpperCase() + r.slice(1)}</option>)}
+                        <label>{typeLabel}</label>
+                        <select value={selectedType} onChange={(e) => setSelectedType(e.target.value)}>
+                            {currentTypes.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
                         </select>
                     </div>
                     <div className="form-group">
                         <label>3. 추가 정보 입력 (선택 사항)</label>
-                        <AdvancedInput
-                            userPrompt={userPrompt}
-                            setUserPrompt={setUserPrompt}
-                        />
+                        <AdvancedInput userPrompt={userPrompt} setUserPrompt={setUserPrompt} />
                     </div>
                     <div className="action-buttons-vertical">
                         <button className="generate-button" onClick={handleGenerateClick} disabled={isLoading || !imageFile}>
@@ -152,9 +164,7 @@ function Content({ activeTool }) {
                     {!previewUrl ? (
                         <div
                             className={`upload-card ${isDragging ? 'drag-over' : ''}`}
-                            onDragOver={handleDragOver}
-                            onDragLeave={handleDragLeave}
-                            onDrop={handleDrop}
+                            onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop}
                             onClick={() => document.getElementById('imageUploadInput').click()}
                         >
                             <span className="material-symbols-outlined upload-icon">add_photo_alternate</span>
@@ -170,6 +180,7 @@ function Content({ activeTool }) {
                                     <div className="comparison-slider-container">
                                         <ReactCompareImage leftImage={previewUrl} rightImage={resultUrl} leftImageLabel="전" rightImageLabel="후"/>
                                     </div>
+                                    <button className="start-new-button" style={{marginTop: '24px'}} onClick={toggleCompareSlider}>결과 보기로 돌아가기</button>
                                 </div>
                             ) : (
                                 <div className="result-view">
@@ -181,9 +192,8 @@ function Content({ activeTool }) {
                                         <div className="image-box-header">
                                             <h3>AI 이미지</h3>
                                             {resultUrl && !isLoading && (
-                                                <button className="compare-button" onClick={toggleCompareSlider}>
+                                                <button className="compare-button" onClick={toggleCompareSlider} title="비교하기">
                                                     <span className="material-symbols-outlined">compare_arrows</span>
-                                                    비교하기
                                                 </button>
                                             )}
                                         </div>
@@ -191,7 +201,7 @@ function Content({ activeTool }) {
                                             {isLoading && <div className="loading-spinner"></div>}
                                             {error && <div className="error-message">{error}</div>}
                                             {resultUrl && !isLoading && <img src={resultUrl} alt="AI Result" />}
-                                            {!resultUrl && !isLoading && !error && <div className="placeholder">생성하기 버튼을 클릭하세요.</div>}
+                                            {!resultUrl && !isLoading && !error && <div className="placeholder">AI 이미지가 여기에 표시됩니다.</div>}
                                         </div>
                                     </div>
                                 </div>
