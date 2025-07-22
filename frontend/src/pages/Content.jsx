@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ReactCompareImage from 'react-compare-image';
-import AdvancedInput from '../components/Editor/AdvancedInput';
+import TiptapEditor from '../components/Editor/TiptapEditor';
 import { generateImage } from '../api/imageApi'; 
 import '../styles/App.css';
 
@@ -144,7 +144,8 @@ function Content({ activeTool }) {
                     </div>
                     <div className="form-group">
                         <label>3. 추가 정보 입력 (선택 사항)</label>
-                        <AdvancedInput userPrompt={userPrompt} setUserPrompt={setUserPrompt} />
+                        {/* ⛔️ 변경점 2: 컴포넌트 이름을 TiptapEditor로 변경합니다. */}
+                        <TiptapEditor userPrompt={userPrompt} setUserPrompt={setUserPrompt} />
                     </div>
                     <div className="action-buttons-vertical">
                         <button className="generate-button" onClick={handleGenerateClick} disabled={isLoading || !imageFile}>
