@@ -9,7 +9,9 @@ from dotenv import load_dotenv
 
 load_dotenv() # .env
 
-SD_API_BASE_URL = os.getenv("SD_API_BASE_URL", "http://127.0.0.1:7860")
+SD_API_BASE_URL = os.getenv("SD_API_BASE_URL")
+if SD_API_BASE_URL is None:
+    raise ValueError("환경 변수 SD_API_BASE_URL이 설정되지 않았습니다. .env 파일을 확인해주세요.")
 
 
 # ==============================================================================
