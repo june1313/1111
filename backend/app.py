@@ -46,7 +46,6 @@ EXTERIOR_STYLE_PROMPTS = {
 
 app = Flask(__name__)
 CORS(app)
-SD_API_BASE_URL = "http://127.0.0.1:7860" # Stable Diffusion API 주소
 
 def generate_sd_image(payload):
     """Stable Diffusion API를 호출하여 이미지 생성을 요청합니다."""
