@@ -102,23 +102,25 @@
     border-radius: 3px;
 }
 
-/* 에디터 콘텐츠 영역 */
+/* 에디터 콘텐츠 영역 (기본) - Content.jsx의 TiptapEditor에 적용 */
 .prose-mirror-editor {
     padding: 16px;
     min-height: 200px;
     outline: none;
     line-height: 1.6;
-    flex-grow: 1; /* 추가 */
-    overflow-y: auto; /* 추가 */
+    flex-grow: 1;
+    overflow-y: auto;
 }
 
 .prose-mirror-editor p {
     margin: 0;
 }
 
+/* 유튜브 iframe 스타일 */
 .prose-mirror-editor iframe {
-    width: 100%;
-    height: 315px;
+    width: 100%; /* 에디터 너비를 꽉 채우도록 */
+    aspect-ratio: 16 / 9; /* 16:9 비율 유지 (유튜브 영상에 적합) */
+    max-width: 100%;
     border: none;
 }
 
@@ -225,7 +227,7 @@
 }
 
 .bubble-menu-container button.is-active {
-  background-color: var(--google-blue); /* 변수 사용 */
+  background-color: var(--google-blue);
   color: white;
 }
 
@@ -236,7 +238,6 @@
   color: #ff5252;
   background-color: #555;
 }
-
 
 /* 링크 편집기 스타일 */
 .link-editor {
@@ -255,11 +256,11 @@
   outline: none;
 }
 .link-input:focus {
-  border-color: var(--google-blue); /* 변수 사용 */
+  border-color: var(--google-blue);
 }
 
 .link-apply-button {
-  background-color: var(--google-blue); /* 변수 사용 */
+  background-color: var(--google-blue);
   color: white;
   border: none;
   padding: 4px 10px;
@@ -286,19 +287,69 @@
     background-color: #555;
 }
 
+/* 기본 링크 스타일 (에디터 내) */
 .prose-mirror-editor a {
-    color: var(--google-blue); /* Google Blue 색상 변수 사용 */
-    text-decoration: underline; /* 밑줄 추가 */
-    cursor: pointer; /* 마우스 오버 시 포인터 변경 */
+    color: var(--google-blue);
+    text-decoration: underline;
+    cursor: pointer;
 }
 
-/* 링크에 마우스 올렸을 때 */
 .prose-mirror-editor a:hover {
-    text-decoration: none; /* 밑줄 제거 또는 다른 효과 */
-    color: #1a5abc; /* Hover 시 색상 변경 */
+    text-decoration: none;
+    color: #1a5abc;
 }
 
 .prose-mirror-editor .ProseMirror-selectedtext a {
     background-color: rgba(0, 123, 255, 0.2); 
     border-radius: 2px; 
+}
+
+/* ✨ 읽기 전용 에디터 스타일 (Profile.jsx의 TiptapContentRenderer에 적용) */
+.prose-mirror-editor.read-only-editor {
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    min-height: auto;
+    cursor: default;
+    box-shadow: none;
+    white-space: normal;
+    word-break: break-word;
+    text-align: left;
+    width: 100%;
+    overflow: visible;
+}
+
+/* 읽기 전용 에디터 내 링크 스타일 */
+.prose-mirror-editor.read-only-editor a {
+    color: #007bff;
+    text-decoration: underline;
+    cursor: pointer;
+    pointer-events: auto;
+}
+
+.prose-mirror-editor.read-only-editor a:hover {
+    text-decoration: none;
+    color: #0056b3;
+}
+
+/* 읽기 전용 에디터 내 하이라이트 스타일 */
+.prose-mirror-editor.read-only-editor mark {
+    background-color: var(--highlight-color, yellow);
+    padding: 0 2px;
+    border-radius: 2px;
+}
+
+/* 읽기 전용 에디터 내 이미지 스타일 */
+.prose-mirror-editor.read-only-editor img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 5px 0;
+}
+
+/* 읽기 전용 에디터 내 표 스타일 */
+.prose-mirror-editor.read-only-editor table {
+    width: 100%;
+    table-layout: fixed;
+    word-break: break-all;
 }

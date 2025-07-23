@@ -52,6 +52,7 @@ function Content({ activeTool }) {
     const [convertedImageUrl, setConvertedImageUrl] = useState(null);
     const [showSaveNotification, setShowSaveNotification] = useState(false);
     const [currentUser, setCurrentUser] = useState(null);
+    const [generatedInfo, setGeneratedInfo] = useState('');
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -72,6 +73,7 @@ function Content({ activeTool }) {
             setPreviewUrl(URL.createObjectURL(file));
             setResultUrl('');
             setConvertedImageUrl(null);
+            setGeneratedInfo('');
             setError(null);
             setShowCompareSlider(false);
             setShowSaveNotification(false);
@@ -95,6 +97,7 @@ function Content({ activeTool }) {
         setIsLoading(true);
         setResultUrl('');
         setConvertedImageUrl(null);
+        setGeneratedInfo('');
         setError(null);
         setShowCompareSlider(false);
         setShowSaveNotification(false);
@@ -116,6 +119,7 @@ function Content({ activeTool }) {
             if (data.imageUrl) {
                 setResultUrl(data.imageUrl);
                 setConvertedImageUrl(data.imageUrl);
+                setGeneratedInfo(data.infoData);
                 setShowSaveNotification(true);
             } else {
                 throw new Error(data.error || 'Image URL not found in response.');
@@ -132,6 +136,7 @@ function Content({ activeTool }) {
         setPreviewUrl('');
         setResultUrl('');
         setConvertedImageUrl(null);
+        setGeneratedInfo('');
         setError(null);
         setShowCompareSlider(false);
         setShowSaveNotification(false);
@@ -159,11 +164,13 @@ function Content({ activeTool }) {
         try {
             const userConversionsCollectionRef = collection(db, `users/${currentUser.uid}/conversions`);
             await addDoc(userConversionsCollectionRef, {
+                // originalImageUrl: previewUrl, // ReactCompareImage를 사용하지 않으므로 이 줄은 제거됨
                 imageUrl: convertedImageUrl,
                 prompt: userPrompt,
                 style: style,
                 type: selectedType,
                 tool: activeTool,
+                info: generatedInfo,
                 createdAt: serverTimestamp(),
             });
 
