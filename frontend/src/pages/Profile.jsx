@@ -2,13 +2,13 @@
 
 import React, { useState, useEffect } from 'react';
 import { auth, db } from '../firebaseConfig';
-import { doc, getDoc, collection, query, orderBy, onSnapshot } from 'firebase/firestore'; // ✨ 추가 임포트
+import { doc, getDoc, collection, query, orderBy, onSnapshot } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { signOut } from 'firebase/auth';
 
 function Profile() {
     const [userEmail, setUserEmail] = useState('');
-    const [userConversions, setUserConversions] = useState([]); // ✨ 변환 목록 상태 추가
+    const [userConversions, setUserConversions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
@@ -18,7 +18,6 @@ function Profile() {
             if (user) {
                 setUserEmail(user.email);
 
-                // Firestore에서 사용자 기본 정보 가져오기 (선택 사항, 이미 이메일은 user.email로 가져옴)
                 try {
                     const userDocRef = doc(db, 'users', user.uid);
                     const userDocSnap = await getDoc(userDocRef);
@@ -30,9 +29,8 @@ function Profile() {
                     setError("사용자 기본 정보를 불러오는 데 실패했습니다.");
                 }
 
-                // ✨ Firestore에서 변환 목록 가져오기
                 const conversionsRef = collection(db, `users/${user.uid}/conversions`);
-                const q = query(conversionsRef, orderBy('createdAt', 'desc')); // 최신순 정렬
+                const q = query(conversionsRef, orderBy('createdAt', 'desc'));
 
                 const unsubscribeFirestore = onSnapshot(q, (snapshot) => {
                     const conversions = snapshot.docs.map(doc => ({
@@ -47,16 +45,16 @@ function Profile() {
                     setLoading(false);
                 });
 
-                return () => unsubscribeFirestore(); // Firestore 구독 해제
+                return () => unsubscribeFirestore();
             } else {
                 setUserEmail('');
-                setUserConversions([]); // 로그아웃 시 목록 초기화
+                setUserConversions([]);
                 setLoading(false);
                 navigate('/login');
             }
         });
 
-        return () => unsubscribeAuth(); // Auth 구독 해제
+        return () => unsubscribeAuth();
     }, [navigate]);
 
     const handleLogout = async () => {
@@ -95,7 +93,7 @@ function Profile() {
             ) : (
                 <div style={{
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', // 반응형 그리드
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
                     gap: '20px',
                     marginTop: '20px'
                 }}>
@@ -125,8 +123,6 @@ function Profile() {
                             <p style={{ fontSize: '0.7em', color: '#aaa', marginTop: '5px' }}>
                                 저장일: {conversion.createdAt?.toDate().toLocaleString()}
                             </p>
-                            {/* "다시 보기" 기능은 이미지를 직접 표시하므로 별도의 버튼이 필요 없을 수 있습니다.
-                                 만약 이미지를 클릭했을 때 더 큰 모달로 보여주는 기능을 원한다면 추가할 수 있습니다. */}
                         </div>
                     ))}
                 </div>

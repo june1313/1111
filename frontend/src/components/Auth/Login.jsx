@@ -1,18 +1,15 @@
 // src/components/Auth/Login.jsx
 
-
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { auth } from '../../firebaseConfig';
 import { signInWithEmailAndPassword } from "firebase/auth";
-
 
 function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const navigate = useNavigate();
-
 
     const handleLogin = async () => {
         setErrorMessage('');
@@ -29,13 +26,14 @@ function Login() {
             } else if (error.code === 'auth/wrong-password') {
                 message = '비밀번호가 일치하지 않습니다.';
             } else if (error.code === 'auth/network-request-failed') {
-                message = '네트워크 연결에 실패했습니다.';
+                message = '네트워크 연결에 실패했습니다. 인터넷 연결을 확인해주세요.'; // 네트워크 오류 추가
+            } else if (error.code === 'auth/invalid-credential') { // Firebase 10 이상에서 통일된 오류
+                message = '잘못된 이메일 또는 비밀번호입니다.';
             }
             alert(message); // 알림 창 표시
-            setErrorMessage(message); // 혹시 모를 상황에 대비하여 상태도 업데이트
+            setErrorMessage(message); // 혹시 모를 상황에 대비하여 상태도 업데이트 (렌더링은 하지 않음)
         }
     };
-
 
     return (
         <div className="container">
@@ -61,9 +59,8 @@ function Login() {
             <button className="generate-button" onClick={handleLogin}>
                 로그인
             </button>
-            {/* 기존의 에러 메시지 표시는 제거 */}
             <p style={{ marginTop: '20px' }}>
-                계정이 없으신가요?{' '}
+                계정이 없으신가요? {' '}
                 <Link to="/register" style={{ color: '#007bff', textDecoration: 'none', cursor: 'pointer' }}>
                     회원가입
                 </Link>
@@ -71,6 +68,5 @@ function Login() {
         </div>
     );
 }
-
 
 export default Login;

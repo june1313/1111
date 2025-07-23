@@ -64,9 +64,9 @@ function App() {
         } />
 
         {/* 프로필 페이지 (로그인 필요) */}
-        <Route path="/profile" element={ // ✨ /profile 경로 추가
+        <Route path="/profile" element={
           <AuthRoute>
-            <MainAppLayoutWithProfile onLogout={handleLogout} /> {/* ✨ Profile 컴포넌트를 포함하는 레이아웃 추가 */}
+            <MainAppLayoutWithProfile onLogout={handleLogout} />
           </AuthRoute>
         } />
 
@@ -114,19 +114,20 @@ function MainAppLayout({ onLogout }) {
     );
 }
 
-// ✨ MainAppLayoutWithProfile 컴포넌트: Sidebar와 Profile을 포함하는 레이아웃
-// Profile 페이지도 Sidebar를 사용하고 싶을 경우 이렇게 별도 레이아웃을 만들 수 있습니다.
+// MainAppLayoutWithProfile 컴포넌트: Sidebar와 Profile을 포함하는 레이아웃
 function MainAppLayoutWithProfile({ onLogout }) {
-    const [activeTool, setActiveTool] = useState(''); // Profile 페이지는 activeTool이 필요 없을 수 있습니다.
+    // Profile 페이지는 activeTool이 직접 필요하지 않으므로, 더미 상태를 전달하거나 아예 제거 가능
+    // 여기서는 Sidebar의 요구사항을 맞춰주기 위해 빈 상태와 함수를 전달합니다.
+    const [activeTool, setActiveTool] = useState('');
 
     return (
         <div className="app-layout">
             <Sidebar
                 activeTool={activeTool}
-                setActiveTool={() => {}} // Profile 페이지에서는 setActiveTool이 작동하지 않도록 빈 함수 전달
+                setActiveTool={setActiveTool} // Profile 페이지에서는 이 함수가 작동하지 않도록
                 onLogout={onLogout}
             />
-            <Profile /> {/* ✨ Profile 컴포넌트 렌더링 */}
+            <Profile />
         </div>
     );
 }

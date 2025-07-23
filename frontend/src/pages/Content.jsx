@@ -6,10 +6,9 @@ import TiptapEditor from '../components/Editor/TiptapEditor';
 import { generateImage } from '../api/imageApi';
 import '../styles/App.css';
 
-// ✨ Firebase 관련 임포트 추가
 import { auth, db } from '../firebaseConfig';
 import { onAuthStateChanged } from 'firebase/auth';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore'; // doc, getDoc 대신 addDoc, collection 사용
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 // 옵션 정의
 const INTERIOR_STYLES = [
@@ -28,7 +27,7 @@ const EXTERIOR_STYLES = [
 ];
 const EXTERIOR_TYPES = [
   { value: 'a commercial building', label: '빌딩' }, { value: 'a detached house', label: '단독주택' },
-  { value: 'an apartment complex', label: '아파트' }, { value: 'a traditional hanok', label: '한옥' },
+  { value: 'an apartment complex', label: '아파트' }, { value: 'a traditional hanok', 'label': '한옥' },
   { value: 'a modern villa', label: '빌라' },
 ];
 
@@ -44,23 +43,21 @@ function Content({ activeTool }) {
 
     const [imageFile, setImageFile] = useState(null);
     const [previewUrl, setPreviewUrl] = useState('');
-    const [resultUrl, setResultUrl] = useState(''); // AI 변환 결과 이미지 URL
+    const [resultUrl, setResultUrl] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isDragging, setIsDragging] = useState(false);
     const [error, setError] = useState(null);
     const [showCompareSlider, setShowCompareSlider] = useState(false);
 
-    // ✨ 새로 추가된 상태 변수들
-    const [convertedImageUrl, setConvertedImageUrl] = useState(null); // Firestore 저장을 위한 최종 이미지 URL
-    const [showSaveNotification, setShowSaveNotification] = useState(false); // 저장 알림 표시 여부
-    const [currentUser, setCurrentUser] = useState(null); // 현재 로그인된 사용자 정보
+    const [convertedImageUrl, setConvertedImageUrl] = useState(null);
+    const [showSaveNotification, setShowSaveNotification] = useState(false);
+    const [currentUser, setCurrentUser] = useState(null);
 
-    // ✨ 컴포넌트 마운트 시 사용자 인증 상태 감지
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
             setCurrentUser(user);
         });
-        return () => unsubscribe(); // 클린업 함수
+        return () => unsubscribe();
     }, []);
 
     useEffect(() => {
@@ -74,10 +71,10 @@ function Content({ activeTool }) {
             setImageFile(file);
             setPreviewUrl(URL.createObjectURL(file));
             setResultUrl('');
-            setConvertedImageUrl(null); // 파일 변경 시 저장할 이미지 URL 초기화
+            setConvertedImageUrl(null);
             setError(null);
             setShowCompareSlider(false);
-            setShowSaveNotification(false); // 파일 변경 시 저장 알림 숨기기
+            setShowSaveNotification(false);
         }
     };
 
@@ -97,10 +94,10 @@ function Content({ activeTool }) {
         }
         setIsLoading(true);
         setResultUrl('');
-        setConvertedImageUrl(null); // 새로운 생성 시 저장할 이미지 URL 초기화
+        setConvertedImageUrl(null);
         setError(null);
         setShowCompareSlider(false);
-        setShowSaveNotification(false); // 생성 시작 시 저장 알림 숨기기
+        setShowSaveNotification(false);
 
         const formData = new FormData();
         formData.append('imageFile', imageFile);
@@ -118,9 +115,8 @@ function Content({ activeTool }) {
 
             if (data.imageUrl) {
                 setResultUrl(data.imageUrl);
-                // ✨ 변환 성공 시, 저장 알림을 위한 URL 설정
                 setConvertedImageUrl(data.imageUrl);
-                setShowSaveNotification(true); // ✨ 저장 알림 표시
+                setShowSaveNotification(true);
             } else {
                 throw new Error(data.error || 'Image URL not found in response.');
             }
@@ -135,10 +131,10 @@ function Content({ activeTool }) {
         setImageFile(null);
         setPreviewUrl('');
         setResultUrl('');
-        setConvertedImageUrl(null); // 초기화 시 저장할 이미지 URL도 초기화
+        setConvertedImageUrl(null);
         setError(null);
         setShowCompareSlider(false);
-        setShowSaveNotification(false); // 새로 시작 시 저장 알림 숨기기
+        setShowSaveNotification(false);
         setUserPrompt('');
         const fileInput = document.getElementById('imageUploadInput');
         if(fileInput) fileInput.value = '';
@@ -146,7 +142,6 @@ function Content({ activeTool }) {
 
     const toggleCompareSlider = () => setShowCompareSlider(!showCompareSlider);
 
-    // ✨ '저장하기' 버튼 클릭 시 호출될 함수
     const handleSaveConvertedImage = async () => {
         if (!currentUser) {
             alert('로그인이 필요합니다. 먼저 로그인해주세요.');
@@ -159,24 +154,20 @@ function Content({ activeTool }) {
             return;
         }
 
-        setShowSaveNotification(false); // 알림 숨기기
+        setShowSaveNotification(false);
 
         try {
-            // Firestore에 변환 결과 정보 저장
             const userConversionsCollectionRef = collection(db, `users/${currentUser.uid}/conversions`);
             await addDoc(userConversionsCollectionRef, {
-                imageUrl: convertedImageUrl, // 최종 변환된 이미지 URL
-                prompt: userPrompt,          // 사용자가 입력한 프롬프트
-                style: style,                // 선택된 스타일
-                type: selectedType,          // 선택된 방/건물 유형
-                tool: activeTool,            // 사용된 도구 (Interior/Exterior)
-                createdAt: serverTimestamp(),// 서버 타임스탬프 (정확한 저장 시간)
+                imageUrl: convertedImageUrl,
+                prompt: userPrompt,
+                style: style,
+                type: selectedType,
+                tool: activeTool,
+                createdAt: serverTimestamp(),
             });
 
             alert('변환 결과가 성공적으로 저장되었습니다!');
-            // 저장 후 convertedImageUrl은 그대로 두어 사용자가 계속 볼 수 있도록 하거나, 초기화할 수 있습니다.
-            // 여기서는 일단 그대로 둡니다.
-            // setConvertedImageUrl(null);
         } catch (error) {
             console.error("변환 결과 저장 실패:", error);
             alert('변환 결과 저장에 실패했습니다: ' + error.message);
@@ -278,7 +269,6 @@ function Content({ activeTool }) {
                 </div>
             </div>
 
-            {/* ✨ 저장 알림 모달/팝업 (조건부 렌더링) */}
             {showSaveNotification && (
                 <div style={{
                     position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',

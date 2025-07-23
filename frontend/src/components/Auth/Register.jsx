@@ -23,19 +23,19 @@ function Register() {
             return;
         }
         if (password.length < 6) {
-            setMessage('비밀번호는 6자 이상이어야 합니다.'); // 메시지 변경
+            setMessage('비밀번호는 6자 이상이어야 합니다.');
             setIsError(true);
             return;
         }
 
-        setMessage('회원가입 중...', false); // isError를 false로 설정하여 로딩 메시지임을 표시
+        setMessage('회원가입 중...', false);
 
         try {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
 
             console.log("회원가입 성공:", user);
-            setMessage('회원가입에 성공했습니다!'); // 메시지 변경
+            setMessage('회원가입에 성공했습니다!');
             setIsError(false);
 
             await setDoc(doc(db, "users", user.uid), {
@@ -44,7 +44,8 @@ function Register() {
             });
 
             console.log(`Firestore에 사용자 ${user.uid}의 기본 정보 저장 성공.`);
-            // 사용자에게는 회원가입 성공 메시지만 보여주고, 내부적으로는 파이어스토어 저장까지 완료됨
+            setMessage('회원가입 및 사용자 정보 저장이 완료되었습니다!');
+
             setEmail('');
             setPassword('');
             navigate('/');
@@ -54,15 +55,15 @@ function Register() {
             const errorMessage = error.message;
             console.error("회원가입 실패:", errorCode, errorMessage);
 
-            let displayMessage = '회원가입에 실패했습니다. 다시 시도해주세요.'; // 기본 실패 메시지
+            let displayMessage = '회원가입에 실패했습니다. 다시 시도해주세요.';
             if (errorCode === 'auth/email-already-in-use') {
-                displayMessage = '이미 사용 중인 이메일 주소입니다. 다른 이메일을 사용해주세요.'; // 더 명확하게
+                displayMessage = '이미 사용 중인 이메일 주소입니다. 다른 이메일을 사용해주세요.';
             } else if (errorCode === 'auth/invalid-email') {
-                displayMessage = '유효하지 않은 이메일 형식입니다. 올바른 이메일을 입력해주세요.'; // 더 구체적으로
+                displayMessage = '유효하지 않은 이메일 형식입니다. 올바른 이메일을 입력해주세요.';
             } else if (errorCode === 'auth/weak-password') {
-                displayMessage = '비밀번호는 6자 이상이어야 합니다. 더 강력한 비밀번호를 사용해주세요.'; // 더 안내적으로
+                displayMessage = '비밀번호는 6자 이상이어야 합니다. 더 강력한 비밀번호를 사용해주세요.';
             } else if (errorCode === 'auth/network-request-failed') {
-                displayMessage = '네트워크 연결에 문제가 있습니다. 인터넷 연결을 확인해주세요.'; // 네트워크 오류 추가
+                displayMessage = '네트워크 연결에 문제가 있습니다. 인터넷 연결을 확인해주세요.';
             }
             setMessage(displayMessage);
             setIsError(true);
