@@ -5,6 +5,12 @@ import base64
 import os # 이 모듈은 더 이상 파일 저장에 필요하지 않으므로, 완전히 제거해도 무방하나, 다른 용도로 사용될 가능성 고려하여 일단 둠
 from datetime import datetime # 이 모듈은 더 이상 파일 저장에 필요하지 않으므로, 완전히 제거해도 무방하나, 다른 용도로 사용될 가능성 고려하여 일단 둠
 import json
+from dotenv import load_dotenv
+
+load_dotenv() # .env
+
+SD_API_BASE_URL = os.getenv("SD_API_BASE_URL", "http://127.0.0.1:7860") # 기본값도 설정 가능
+
 
 # ==============================================================================
 # ✨ 1. 설정 영역 (Configuration Area)
