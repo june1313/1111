@@ -35,6 +35,7 @@ function Register() {
             const user = userCredential.user;
 
             console.log("회원가입 성공:", user);
+            // 메시지를 사용자에게 보여주는 부분 (UI 텍스트)
             setMessage('회원가입에 성공했습니다!');
             setIsError(false);
 
@@ -44,7 +45,8 @@ function Register() {
             });
 
             console.log(`Firestore에 사용자 ${user.uid}의 기본 정보 저장 성공.`);
-            setMessage('회원가입 및 사용자 정보 저장이 완료되었습니다!');
+            // 최종적으로 사용자에게 보여줄 알림창 추가
+            alert('회원가입이 완료되었습니다!'); // ✨ 이 부분 추가!
 
             setEmail('');
             setPassword('');
