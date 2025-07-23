@@ -170,7 +170,9 @@ function Content({ activeTool }) {
                 style: style,
                 type: selectedType,
                 tool: activeTool,
-                info: generatedInfo,
+                info: generatedInfo || null, // ✨ 이 부분을 수정합니다. generatedInfo가 undefined면 null을 저장
+                // 또는 info: generatedInfo || '', // generatedInfo가 undefined면 빈 문자열을 저장
+                createdAt: serverTimestamp(),
                 createdAt: serverTimestamp(),
             });
 
