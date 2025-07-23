@@ -4,6 +4,7 @@ import {
   AlignLeft, AlignCenter, AlignRight, Link2, Eraser, Highlighter,
   Minus, Code, Undo, Redo, Image as ImageIcon
 } from 'lucide-react';
+import { Table as TableIcon } from 'lucide-react';
 
 // 재사용 가능한 툴바 버튼 컴포넌트
 const ToolbarButton = ({ editor, onClickCommand, isActive, title, icon: Icon, disabled = false, className = '' }) => (
@@ -45,6 +46,7 @@ const ALIGN_LIST_BUTTONS = [
 const INSERT_BUTTONS = [
   { icon: Minus, title: '구분선', command: (editor) => () => editor.chain().focus().setHorizontalRule().run() },
   { icon: Code, title: '코드 블록', command: (editor) => () => editor.chain().focus().toggleCodeBlock().run(), isActive: (editor) => editor.isActive('codeBlock') },
+  { icon: TableIcon, title: '표 삽입', command: (editor) => () => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run() },
 ];
 
 
