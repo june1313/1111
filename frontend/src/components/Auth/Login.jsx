@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../../firebaseConfig'; // firebaseConfig 경로 확인 필요
+import { signInWithEmailAndPassword, setPersistence, browserSessionPersistence } from 'firebase/auth'; // ✨ setPersistence와 browserSessionPersistence 임포트 추가
+import { auth } from '../../firebaseConfig';
 
 function Login() {
     const [email, setEmail] = useState('');
@@ -22,6 +22,10 @@ function Login() {
         setError('');
 
         try {
+            // ✨ 로그인 전에 세션 유지 방식을 SESSION으로 설정
+            // 브라우저 탭/창을 닫으면 자동으로 로그아웃됩니다.
+            await setPersistence(auth, browserSessionPersistence);
+
             await signInWithEmailAndPassword(auth, email, password);
             navigate('/'); // 로그인 성공 시 메인 페이지로 이동
         } catch (err) {
