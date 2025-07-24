@@ -175,7 +175,6 @@ function Content() {
                 info: generatedInfo || null, // ✨ 이 부분을 수정합니다. generatedInfo가 undefined면 null을 저장
                 // 또는 info: generatedInfo || '', // generatedInfo가 undefined면 빈 문자열을 저장
                 createdAt: serverTimestamp(),
-                createdAt: serverTimestamp(),
             });
 
             alert('변환 결과가 성공적으로 저장되었습니다!');
