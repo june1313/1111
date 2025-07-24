@@ -5,7 +5,8 @@ import ReactCompareImage from 'react-compare-image';
 import TiptapEditor from '../components/Editor/TiptapEditor';
 import { generateImage } from '../api/imageApi';
 import '../styles/App.css';
-
+import { useAppContext } from '../App';
+import CustomDropdown from '../components/Editor/CustomDropdown';
 import { auth, db } from '../firebaseConfig';
 import { onAuthStateChanged } from 'firebase/auth';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
@@ -31,7 +32,8 @@ const EXTERIOR_TYPES = [
   { value: 'a modern villa', label: '빌라' },
 ];
 
-function Content({ activeTool }) {
+function Content() {
+    const { activeTool } = useAppContext();
     const isInterior = activeTool === 'Interior';
     const currentStyles = isInterior ? INTERIOR_STYLES : EXTERIOR_STYLES;
     const currentTypes = isInterior ? ROOM_TYPES : EXTERIOR_TYPES;
@@ -192,27 +194,38 @@ function Content({ activeTool }) {
             </div>
 
             <div className="main-layout">
-                <div className="controls-panel">
-                    <h3>
-                        <span className="material-symbols-outlined">tune</span>
-                        디자인 설정
-                    </h3>
-                    <div className="form-group">
-                        <label>1. 스타일 선택</label>
-                        <select value={style} onChange={(e) => setStyle(e.target.value)}>
-                            {currentStyles.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
-                        </select>
-                    </div>
-                    <div className="form-group">
-                        <label>{typeLabel}</label>
-                        <select value={selectedType} onChange={(e) => setSelectedType(e.target.value)}>
-                            {currentTypes.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
-                        </select>
-                    </div>
-                    <div className="form-group">
-                        <label>3. 추가 정보 입력 (선택 사항)</label>
-                        <TiptapEditor userPrompt={userPrompt} setUserPrompt={setUserPrompt} />
-                    </div>
+    <div className="controls-panel">
+        <h3>
+            <span className="material-symbols-outlined">tune</span>
+            디자인 설정
+        </h3>
+
+        {/* ✨ 1. 스타일 선택 드롭다운 교체 */}
+        <div className="form-group">
+            <label>1. 스타일 선택</label>
+            <CustomDropdown
+                value={style}
+                options={currentStyles}
+                onChange={(value) => setStyle(value)}
+                renderButtonContent={selectedOption => <span>{selectedOption ? selectedOption.label : '선택...'}</span>}
+            />
+        </div>
+
+        {/* ✨ 2. 공간 유형 선택 드롭다운 교체 */}
+        <div className="form-group">
+            <label>{typeLabel}</label>
+            <CustomDropdown
+                value={selectedType}
+                options={currentTypes}
+                onChange={(value) => setSelectedType(value)}
+                renderButtonContent={selectedOption => <span>{selectedOption ? selectedOption.label : '선택...'}</span>}
+            />
+        </div>
+
+        <div className="form-group">
+            <label>3. 추가 정보 입력 (선택 사항)</label>
+            <TiptapEditor userPrompt={userPrompt} setUserPrompt={setUserPrompt} />
+        </div>
                     <div className="action-buttons-vertical">
                         <button className="generate-button" onClick={handleGenerateClick} disabled={isLoading || !imageFile}>
                             <span className="material-symbols-outlined">auto_awesome</span>

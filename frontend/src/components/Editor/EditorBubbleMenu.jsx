@@ -1,20 +1,26 @@
-// EditorBubbleMenu.jsx
+// frontend/src/components/Editor/EditorBubbleMenu.jsx (전체 코드)
 
 import React, { useState, useCallback, useRef } from 'react';
 import { BubbleMenu } from '@tiptap/react';
 import { Bold, Italic, Underline as UnderlineIcon, Strikethrough, Code, Link2, Trash2 } from 'lucide-react';
+import CustomDropdown from './CustomDropdown'; // ✨ CustomDropdown import
 
-// === 재사용 가능한 버블 메뉴 버튼 컴포넌트 ===
-// ToolbarButton과 유사하게, 버블 메뉴 내의 각 버튼에 대한 공통 로직을 캡슐화합니다.
 const BubbleMenuButton = ({ editor, commandName, onClickCommand, isActive, icon: Icon }) => (
   <button
     onClick={() => onClickCommand ? onClickCommand() : editor.chain().focus()[commandName]().run()}
     className={isActive ? 'is-active' : ''}
   >
-    <Icon size={16} /> {/* 버블 메뉴 아이콘은 16px로 줄였습니다 */}
+    <Icon size={16} />
   </button>
 );
 
+// ✨ 드롭다운에 사용할 옵션 배열
+const BUBBLE_STYLE_OPTIONS = [
+  { value: 'p', label: '본문' },
+  { value: 'h1', label: '제목 1' },
+  { value: 'h2', label: '제목 2' },
+  { value: 'h3', label: '제목 3' },
+];
 
 const EditorBubbleMenu = ({ editor }) => {
   const [isLinkEditorOpen, setIsLinkEditorOpen] = useState(false);
@@ -55,6 +61,12 @@ const EditorBubbleMenu = ({ editor }) => {
     return null;
   }
 
+  // ✨ 현재 활성화된 스타일 값을 찾는 로직
+  const currentStyle = BUBBLE_STYLE_OPTIONS.find(opt => {
+      if (opt.value === 'p') return editor.isActive('paragraph');
+      return editor.isActive('heading', { level: parseInt(opt.value.replace('h', '')) });
+    })?.value || 'p';
+
   return (
     <BubbleMenu
       editor={editor}
@@ -81,26 +93,18 @@ const EditorBubbleMenu = ({ editor }) => {
         </div>
       ) : (
         <div className="bubble-menu-buttons">
-          {/* 블록 타입 드롭다운 그룹 */}
+          {/* ✨ 기존 select를 CustomDropdown으로 교체 */}
           <div className="button-group">
-            <select
-              className="toolbar-select bubble-select"
-              onChange={(e) => {
-                const value = e.target.value;
-                if (value === 'p') editor.chain().focus().setParagraph().run();
-                else editor.chain().focus().toggleHeading({ level: parseInt(value.replace('h', ''), 10) }).run();
-              }}
-              value={
-                editor.isActive('heading', { level: 1 }) ? 'h1' :
-                editor.isActive('heading', { level: 2 }) ? 'h2' :
-                editor.isActive('heading', { level: 3 }) ? 'h3' : 'p'
-              }
-            >
-              <option value="p">본문</option>
-              <option value="h1">제목 1</option>
-              <option value="h2">제목 2</option>
-              <option value="h3">제목 3</option>
-            </select>
+             <CustomDropdown
+                value={currentStyle}
+                options={BUBBLE_STYLE_OPTIONS}
+                onChange={value => {
+                  if (value === 'p') editor.chain().focus().setParagraph().run();
+                  else editor.chain().focus().toggleHeading({ level: parseInt(value.replace('h', '')) }).run();
+                }}
+                renderButtonContent={selectedOption => <span>{selectedOption ? selectedOption.label : '스타일'}</span>}
+                buttonClassName="bubble-dropdown-button" // ✨ 버블 메뉴용 스타일 클래스 추가
+              />
           </div>
 
           {/* 텍스트 포맷팅 버튼 그룹 (Bold, Italic, Underline, Strikethrough, Code) */}

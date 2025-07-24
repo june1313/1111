@@ -1,21 +1,21 @@
-/* --- Tiptap 에디터 스타일 --- */
+/* frontend/src/components/Editor/editor.css (전체 코드) */
 
+/* --- Tiptap 에디터 스타일 --- */
 .editor-wrapper {
-    /* App.css의 CSS 변수를 사용하여 디자인 일관성 유지 */
     border: 1px solid var(--border-color);
     border-radius: 8px;
-    overflow: hidden;
+    overflow: visible; /* 드롭다운이 잘리지 않도록 visible로 유지 */
     background-color: var(--surface-color);
-    display: flex; 
+    display: flex;
     flex-direction: column;
 }
 
 /* 툴바 */
 .editor-toolbar {
     display: flex;
-    flex-wrap: wrap; 
+    flex-wrap: wrap;
     align-items: center;
-    gap: 4px; 
+    gap: 4px;
     padding: 8px;
     border-bottom: 1px solid #ddd;
     background-color: #f8f9fa;
@@ -49,23 +49,6 @@
     cursor: not-allowed;
 }
 
-/* 툴바 드롭다운 메뉴 (select) */
-.editor-toolbar .toolbar-select {
-    padding: 4px 6px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background-color: #fff;
-    font-size: 14px;
-    flex-shrink: 0;
-    width: auto;
-    height: 30px;
-}
-
-.editor-toolbar .font-size-select {
-    min-width: 55px;
-    text-align: center;
-}
-
 /* 툴바 구분선 */
 .toolbar-separator {
     width: 1px;
@@ -75,34 +58,7 @@
     flex-shrink: 0;
 }
 
-/* 색상 및 하이라이트 버튼 */
-.editor-toolbar .color-swatch {
-    width: 24px;
-    height: 24px;
-    padding: 0;
-    border: 1px solid #ccc;
-}
-
-.editor-toolbar .color-swatch.is-active {
-    border-color: #333;
-    outline: 2px solid var(--google-blue);
-}
-
-.editor-toolbar .highlight-swatch {
-    width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.editor-toolbar .highlight-color {
-    width: 20px;
-    height: 20px;
-    border-radius: 3px;
-}
-
-/* 에디터 콘텐츠 영역 (기본) - Content.jsx의 TiptapEditor에 적용 */
+/* 에디터 콘텐츠 영역 */
 .prose-mirror-editor {
     padding: 16px;
     min-height: 200px;
@@ -116,10 +72,14 @@
     margin: 0;
 }
 
+.prose-mirror-editor:focus {
+    outline: none;
+}
+
 /* 유튜브 iframe 스타일 */
 .prose-mirror-editor iframe {
-    width: 100%; /* 에디터 너비를 꽉 채우도록 */
-    aspect-ratio: 16 / 9; /* 16:9 비율 유지 (유튜브 영상에 적합) */
+    width: 100%;
+    aspect-ratio: 16 / 9;
     max-width: 100%;
     border: none;
 }
@@ -129,6 +89,7 @@
     border-collapse: collapse;
     margin: 1rem 0;
     width: 100%;
+    table-layout: auto;
 }
 
 .prose-mirror-editor th,
@@ -137,6 +98,7 @@
     padding: 8px;
     min-width: 1em;
     vertical-align: top;
+    position: relative;
 }
 
 .prose-mirror-editor th {
@@ -154,9 +116,9 @@
 
 /* 이미지 리사이즈 핸들 */
 .resizable-image-container {
-    display: inline-block; 
+    display: inline-block;
     position: relative;
-    line-height: 0; 
+    line-height: 0;
 }
 
 .resizable-image-container.selected {
@@ -164,7 +126,7 @@
 }
 
 .resizable-image-container img {
-    max-width: 100%; 
+    max-width: 100%;
     height: auto;
 }
 
@@ -181,7 +143,7 @@
     box-shadow: 0 0 5px rgba(0,0,0,0.2);
 }
 
-/* EditorBubbleMenu.jsx를 위한 스타일 */
+/* --- EditorBubbleMenu.jsx를 위한 스타일 --- */
 .bubble-menu-container {
   background-color: #333;
   color: white;
@@ -193,6 +155,78 @@
   transition: opacity 0.2s ease-in-out;
 }
 
+.bubble-menu-buttons {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.button-group {
+  display: flex;
+  align-items: center;
+  padding: 0 4px;
+}
+
+.button-group:not(:last-child) {
+  border-right: 1px solid #555;
+}
+
+/* editor.css 파일 수정 */
+
+/* --- Tiptap 버블 메뉴 드롭다운 문제 해결을 위한 전체 코드 --- */
+
+.bubble-menu-container {
+  background-color: #333;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: opacity 0.2s ease-in-out;
+  
+  /* ✨ [수정] 드롭다운 메뉴가 컨테이너 밖으로 나갈 수 있도록 허용 */
+  overflow: visible !important;
+}
+
+.bubble-menu-buttons {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.button-group {
+  display: flex;
+  align-items: center;
+  padding: 0 4px;
+
+  /* ✨ [수정] 드롭다운 메뉴의 위치 기준점으로 설정 */
+  position: relative;
+}
+
+.button-group:not(:last-child) {
+  border-right: 1px solid #555;
+}
+/* editor.css 최종 수정본 */
+
+/* --- Tiptap 버블 메뉴 & 커스텀 드롭다운 최종 스타일 --- */
+
+/* 1. 버블 메뉴 컨테이너: 드롭다운이 밖으로 나갈 수 있도록 설정 */
+.bubble-menu-container {
+  background-color: #333;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: opacity 0.2s ease-in-out;
+  
+  /* ✨ 핵심: 자식 요소(드롭다운)가 컨테이너를 벗어날 수 있도록 허용 */
+  overflow: visible !important; 
+}
+
+/* 2. 버블 메뉴 내부 버튼 및 그룹 스타일 (기존 코드 유지) */
 .bubble-menu-buttons {
   display: flex;
   align-items: center;
@@ -230,15 +264,79 @@
   background-color: var(--google-blue);
   color: white;
 }
-
-.bubble-menu-container .unlink-button {
-  color: #ff8c8c;
+.bubble-menu-container {
+  background-color: #333;
+  color: white;
+  padding: 4px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  
+  /* ✨ 중요: 이 속성 덕분에 드롭다운이 밖으로 나갈 수 있습니다. */
+  overflow: visible !important;
 }
-.bubble-menu-container .unlink-button:hover {
-  color: #ff5252;
+
+.bubble-menu-buttons {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.bubble-menu-container .button-group {
+  display: flex;
+  align-items: center;
+  padding: 0 4px;
+}
+
+.bubble-menu-container .button-group:not(:last-child) {
+  border-right: 1px solid #555;
+}
+
+.bubble-menu-container button {
+  background: none;
+  border: none;
+  color: #ccc;
+  padding: 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bubble-menu-container button:hover {
   background-color: #555;
+  color: white;
 }
 
+.bubble-menu-container button.is-active {
+  background-color: var(--google-blue);
+  color: white;
+}
+
+
+/* --- 2. 버블 메뉴 내부 드롭다운 문제 해결 (핵심 코드) --- */
+
+/* 드롭다운을 감싸는 컨테이너를 위치의 기준점으로 설정합니다. */
+.bubble-menu-container .custom-dropdown-container {
+  position: relative;
+}
+
+/* 드롭다운 패널의 위치를 CSS로 직접 제어합니다. */
+.bubble-menu-container .custom-dropdown-panel {
+  /* JS가 주는 position:fixed와 top/left를 모두 무시하고 덮어씁니다. */
+  position: absolute !important; 
+  top: auto !important;
+  left: 0 !important;
+  
+  /* ✨ 버튼의 위쪽으로 패널을 위치시킵니다. */
+  bottom: calc(100% + 4px); /* 버튼(100%) 바로 위 + 4px 간격 */
+  
+  /* 너비도 JS의 계산값을 무시하고 내용에 맞게 조절합니다. */
+  width: max-content !important; 
+  min-width: 150px;
+}
 /* 링크 편집기 스타일 */
 .link-editor {
   display: flex;
@@ -269,22 +367,8 @@
   font-size: 14px;
 }
 
-.link-apply-button:hover {  
+.link-apply-button:hover {
   background-color: #0056b3;
-}
-
-/* 버블 메뉴 내 선택(select) 스타일 */
-.toolbar-select.bubble-select {
-  background-color: #333;
-  color: #ccc;
-  padding: 4px 6px;
-  font-size: 14px;
-  border: 1px solid #555;
-  border-radius: 4px;
-  margin-right: 4px;
-}
-.toolbar-select.bubble-select:hover {
-    background-color: #555;
 }
 
 /* 기본 링크 스타일 (에디터 내) */
@@ -294,62 +378,189 @@
     cursor: pointer;
 }
 
-.prose-mirror-editor a:hover {
-    text-decoration: none;
-    color: #1a5abc;
+/* --- 색상 선택 드롭다운 스타일 --- */
+.color-picker-container {
+  position: relative;
 }
 
-.prose-mirror-editor .ProseMirror-selectedtext a {
-    background-color: rgba(0, 123, 255, 0.2); 
-    border-radius: 2px; 
+.color-dropdown {
+  position: fixed;
+  z-index: 10;
+  background-color: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 8px;
 }
 
-/* ✨ 읽기 전용 에디터 스타일 (Profile.jsx의 TiptapContentRenderer에 적용) */
-.prose-mirror-editor.read-only-editor {
-    background-color: transparent;
-    border: none;
-    padding: 0;
-    min-height: auto;
-    cursor: default;
-    box-shadow: none;
-    white-space: normal;
-    word-break: break-word;
-    text-align: left;
-    width: 100%;
-    overflow: visible;
+.color-grid {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 4px;
+  overflow-x: auto;
 }
 
-/* 읽기 전용 에디터 내 링크 스타일 */
-.prose-mirror-editor.read-only-editor a {
-    color: #007bff;
-    text-decoration: underline;
-    cursor: pointer;
-    pointer-events: auto;
+.color-swatch-dropdown {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  flex-shrink: 0;
 }
 
-.prose-mirror-editor.read-only-editor a:hover {
-    text-decoration: none;
-    color: #0056b3;
+
+.color-swatch-dropdown:hover {
+  border-color: var(--text-primary);
 }
 
-/* 읽기 전용 에디터 내 하이라이트 스타일 */
-.prose-mirror-editor.read-only-editor mark {
-    background-color: var(--highlight-color, yellow);
-    padding: 0 2px;
-    border-radius: 2px;
+.color-swatch-dropdown.is-active {
+  border-color: var(--google-blue);
+  box-shadow: inset 0 0 0 2px var(--google-blue);
 }
 
-/* 읽기 전용 에디터 내 이미지 스타일 */
-.prose-mirror-editor.read-only-editor img {
-    max-width: 100%;
-    height: auto;
-    display: block;
-    margin: 5px 0;
+/* --- 커스텀 드롭다운 스타일 (수정) --- */
+.custom-dropdown-container {
+  position: relative;
+  flex-shrink: 0;
 }
 
-/* 읽기 전용 에디터 내 표 스타일 */
-.prose-mirror-editor.read-only-editor table {
-    width: 100%;
-    table-layout: fixed;
-    word-break: break-all;
+.custom-dropdown-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  height: 30px;
+  min-width: 60px;
+  justify-content: space-between;
+}
+
+.custom-dropdown-button:hover {
+  background-color: #f8f9fa;
+}
+
+.custom-dropdown-panel {
+  position: fixed;
+  z-index: 10;
+  background-color: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 4px;
+  /* ✨ 이 부분의 min-width 속성을 제거하여 너비가 내용에 맞게 자동 조절되도록 수정 */
+  overflow-y: auto;
+}
+
+.custom-dropdown-option {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  border-radius: 4px;
+  /* ✨ 아래 3줄 추가 */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.custom-dropdown-option:hover {
+  background-color: #f1f3f5;
+}
+
+.custom-dropdown-option.is-active {
+  background-color: var(--google-blue);
+  color: white;
+}
+
+/* --- 버블 메뉴 내 커스텀 드롭다운 스타일 (새로 추가) --- */
+.bubble-dropdown-button {
+  background-color: #333;
+  color: #ccc;
+  border: 1px solid #555;
+  height: auto;
+  padding: 4px 6px;
+  gap: 4px;
+}
+
+.bubble-dropdown-button:hover {
+  background-color: #555;
+}
+
+.bubble-dropdown-button .lucide { /* 버블 메뉴 드롭다운 화살표 아이콘 색상 */
+  color: #ccc;
+}
+
+/* editor.css 파일 맨 아래에 추가 */
+
+/* Tiptap 에디터 색상 팔레트가 화면을 벗어나는 문제 해결 */
+.color-grid {
+  display: flex;
+  flex-wrap: wrap; /* 공간이 부족하면 다음 줄로 자동 줄바꿈 */
+
+  /* (선택) 디자인 개선 */
+  max-width: 250px; /* 팔레트의 최대 너비를 지정해 모바일에서 보기 좋게 함 */
+  gap: 5px;         /* 색상 아이템 사이의 간격 */
+  padding: 8px;       /* 팔레트 내부 여백 */
+}/* 
+/* 
+  editor.css 파일에서, 이전에 추가했던 모든 버블 메뉴 관련 
+  스타일 코드를 삭제하고 아래의 최종 코드로 교체해주세요.
+*/
+
+/* --- 버블 메뉴 전용 드롭다운 모든 문제 최종 해결 --- */
+
+/* 1. ✨ [핵심 수정] 버튼을 감싸는 '틀'이 늘어나지 않도록 크기를 고정합니다. */
+.bubble-menu-container .custom-dropdown-container {
+  display: inline-flex; /* 틀의 크기를 내용물(버튼)에 딱 맞춥니다. */
+  position: relative;
+}
+
+/* 2. 드롭다운 패널의 위치, 테마, 너비를 정의합니다. */
+.bubble-menu-container .custom-dropdown-panel {
+  position: absolute !important; 
+  bottom: calc(100% + 4px) !important;
+  top: auto !important;
+  left: 0 !important;
+  box-sizing: border-box !important;
+  width: fit-content;
+
+  /* 검은색 테마 */
+  background-color: #444;
+  border: 1px solid #666;
+  border-radius: 6px;
+  padding: 4px;
+}
+
+/* 3. 드롭다운 내부 각 옵션의 스타일 */
+.bubble-menu-container .custom-dropdown-option {
+  color: #ddd;
+  padding: 8px 2px !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bubble-menu-container .custom-dropdown-option:hover {
+  background-color: #555;
+  color: white;
+  width: fit-content;
+}
+
+.bubble-menu-container .custom-dropdown-option.is-active {
+  background-color: var(--google-blue);
+  color: white;
 }

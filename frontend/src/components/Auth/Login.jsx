@@ -1,69 +1,89 @@
 // src/components/Auth/Login.jsx
 
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { auth } from '../../firebaseConfig';
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { Link, useNavigate } from 'react-router-dom';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../../firebaseConfig'; // firebaseConfig 경로 확인 필요
 
 function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [errorMessage, setErrorMessage] = useState('');
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
+    // ✨ 1. 실제 로그인 로직을 처리하는 함수
     const handleLogin = async () => {
-        setErrorMessage('');
+        if (!email || !password) {
+            setError('이메일과 비밀번호를 모두 입력해주세요.');
+            return;
+        }
+        setLoading(true);
+        setError('');
+
         try {
             await signInWithEmailAndPassword(auth, email, password);
-            console.log('로그인 성공');
-            navigate('/');
-        } catch (error) {
-            let message = '로그인에 실패했습니다.';
-            if (error.code === 'auth/invalid-email') {
-                message = '유효하지 않은 이메일 형식입니다.';
-            } else if (error.code === 'auth/user-not-found') {
-                message = '등록되지 않은 이메일입니다.';
-            } else if (error.code === 'auth/wrong-password') {
-                message = '비밀번호가 일치하지 않습니다.';
-            } else if (error.code === 'auth/network-request-failed') {
-                message = '네트워크 연결에 실패했습니다. 인터넷 연결을 확인해주세요.'; // 네트워크 오류 추가
-            } else if (error.code === 'auth/invalid-credential') { // Firebase 10 이상에서 통일된 오류
-                message = '잘못된 이메일 또는 비밀번호입니다.';
+            navigate('/'); // 로그인 성공 시 메인 페이지로 이동
+        } catch (err) {
+            // Firebase 에러 코드에 따른 한글 메시지 처리
+            switch (err.code) {
+                case 'auth/user-not-found':
+                    setError('등록되지 않은 이메일입니다.');
+                    break;
+                case 'auth/wrong-password':
+                    setError('비밀번호가 일치하지 않습니다.');
+                    break;
+                case 'auth/invalid-email':
+                    setError('유효하지 않은 이메일 형식입니다.');
+                    break;
+                default:
+                    setError('로그인에 실패했습니다. 잠시 후 다시 시도해주세요.');
+                    console.error("Login error:", err);
             }
-            alert(message); // 알림 창 표시
-            setErrorMessage(message); // 혹시 모를 상황에 대비하여 상태도 업데이트 (렌더링은 하지 않음)
+        } finally {
+            setLoading(false);
         }
+    };
+
+    // ✨ 2. form 태그의 제출 이벤트를 처리하는 함수
+    const handleLoginSubmit = (event) => {
+        event.preventDefault(); // form의 기본 동작(페이지 새로고침) 방지
+        handleLogin(); // 위에서 만든 로그인 함수 호출
     };
 
     return (
         <div className="container">
-            <h2>로그인</h2>
-            <div className="form-group">
-                <input
-                    type="email"
-                    placeholder="이메일 주소"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                />
-            </div>
-            <div className="form-group">
-                <input
-                    type="password"
-                    placeholder="비밀번호"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                />
-            </div>
-            <button className="generate-button" onClick={handleLogin}>
-                로그인
-            </button>
-            <p style={{ marginTop: '20px' }}>
-                계정이 없으신가요? {' '}
-                <Link to="/register" style={{ color: '#007bff', textDecoration: 'none', cursor: 'pointer' }}>
-                    회원가입
-                </Link>
+            {/* ✨ 3. form 태그로 모든 입력 필드와 버튼을 감싸고 onSubmit 이벤트 연결 */}
+            <form onSubmit={handleLoginSubmit}>
+                <h2>로그인</h2>
+                <div className="form-group">
+                    <input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="이메일"
+                        required
+                    />
+                </div>
+                <div className="form-group">
+                    <input
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="비밀번호"
+                        required
+                    />
+                </div>
+
+                {error && <p className="error" style={{ marginBottom: '16px' }}>{error}</p>}
+
+                {/* ✨ 4. 로그인 버튼에 type="submit" 속성 추가 */}
+                <button type="submit" className="generate-button" disabled={loading}>
+                    {loading ? '로그인 중...' : '로그인'}
+                </button>
+            </form>
+            <p style={{ marginTop: '24px' }}>
+                계정이 없으신가요? <Link to="/register">가입하기</Link>
             </p>
         </div>
     );
