@@ -20,4 +20,9 @@ export default defineConfig({
       '*.ngrok-free.app', // ✨ 와일드카드 사용을 권장합니다. (단, 보안상 주의)
     ],
   },
+    build: {
+    rollupOptions: {
+      external: ['lucide-react'], // ✨ 이 줄을 추가합니다.
+    },
+  },
 })
